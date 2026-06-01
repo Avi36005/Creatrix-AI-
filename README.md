@@ -252,3 +252,4 @@ Deploys backend to **Cloud Run** + frontend to **Firebase Hosting** with a singl
 [![Deployed on GCP](https://img.shields.io/badge/Deployed%20on-Google%20Cloud-4285F4?style=flat-square&logo=googlecloud)](https://cloud.google.com)
 
 </div>
+<!-- repository indexing trigger -->
