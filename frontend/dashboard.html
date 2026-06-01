@@ -2377,14 +2377,18 @@
         
         <div style="display: flex; flex-direction: column; gap: 20px; max-width: 500px;">
           <div>
-            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">CLAUDE API KEY</label>
-            <input type="password" class="input-handle" style="border-radius: 8px;" value="••••••••••••••••••••••••••••••••">
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">GEMINI API KEY</label>
+            <input type="password" class="input-handle" id="setting-gemini-key" style="border-radius: 8px;" placeholder="AIza...">
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">GROQ API KEY</label>
+            <input type="password" class="input-handle" id="setting-groq-key" style="border-radius: 8px;" placeholder="gsk_...">
           </div>
           <div>
             <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">ELEVENLABS API KEY</label>
-            <input type="password" class="input-handle" style="border-radius: 8px;" value="••••••••••••••••••••••••••••••••">
+            <input type="password" class="input-handle" id="setting-elevenlabs-key" style="border-radius: 8px;" placeholder="sk_...">
           </div>
-          <button class="btn-action" style="align-self: flex-start;">Save Keys</button>
+          <button class="btn-action" id="btn-save-keys" style="align-self: flex-start;">Save Keys</button>
         </div>
       </div>
     </div>
@@ -2599,7 +2603,7 @@
             logOverviewTerm('FastAPI agent offline. Running local simulation...', 'system');
             setTimeout(() => logOverviewTerm('Scanning trend signals on Reddit, LinkedIn, YouTube...', 'info'), 600);
             setTimeout(() => logOverviewTerm('Running Ratefluencer Score™ ML calculation...', 'info'), 1300);
-            setTimeout(() => logOverviewTerm('Generating viral hook scripts with Claude AI...', 'info'), 2000);
+            setTimeout(() => logOverviewTerm('Generating viral hook scripts with Gemini AI...', 'info'), 2000);
             setTimeout(() => logOverviewTerm('Creatrix AI workflow complete! ✓', 'done'), 2600);
           } finally {
             setTimeout(() => {
@@ -2620,6 +2624,38 @@
         div.innerHTML = `<span class="term-ts">[${time}]</span><span class="term-msg ${colorClass}">${msg}</span>`;
         overviewTerm.appendChild(div);
         overviewTerm.scrollTop = overviewTerm.scrollHeight;
+      }
+
+      // ─── Settings: Load saved keys on open ───────────────────────────────
+      const geminiKeyInput = document.getElementById('setting-gemini-key');
+      const groqKeyInput = document.getElementById('setting-groq-key');
+      const elevenlabsKeyInput = document.getElementById('setting-elevenlabs-key');
+      const saveKeysBtn = document.getElementById('btn-save-keys');
+
+      if (geminiKeyInput && localStorage.getItem('gemini_api_key')) {
+        geminiKeyInput.value = localStorage.getItem('gemini_api_key');
+      }
+      if (groqKeyInput && localStorage.getItem('groq_api_key')) {
+        groqKeyInput.value = localStorage.getItem('groq_api_key');
+      }
+      if (elevenlabsKeyInput && localStorage.getItem('elevenlabs_api_key')) {
+        elevenlabsKeyInput.value = localStorage.getItem('elevenlabs_api_key');
+      }
+
+      if (saveKeysBtn) {
+        saveKeysBtn.addEventListener('click', () => {
+          if (geminiKeyInput && geminiKeyInput.value.trim()) {
+            localStorage.setItem('gemini_api_key', geminiKeyInput.value.trim());
+          }
+          if (groqKeyInput && groqKeyInput.value.trim()) {
+            localStorage.setItem('groq_api_key', groqKeyInput.value.trim());
+          }
+          if (elevenlabsKeyInput && elevenlabsKeyInput.value.trim()) {
+            localStorage.setItem('elevenlabs_api_key', elevenlabsKeyInput.value.trim());
+          }
+          saveKeysBtn.textContent = 'Saved ✓';
+          setTimeout(() => { saveKeysBtn.textContent = 'Save Keys'; }, 2000);
+        });
       }
 
       // ─── Loading state helper ─────────────────────────────────────────────

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creatrix AI — Choose Your Track</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #01050e;
+      --bg-card: #0C1229;
+      --border: rgba(255, 255, 255, 0.08);
+      --blue: #4F8EF7;
+      --purple: #A78BFA;
+      --text-primary: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --font-sans: 'DM Sans', sans-serif;
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-card: 24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background glows ── */
+    .bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-glow-blue {
+      width: 600px; height: 600px;
+      background: rgba(79, 142, 247, 0.07);
+      top: -100px; left: -150px;
+    }
+    .bg-glow-purple {
+      width: 500px; height: 500px;
+      background: rgba(167, 139, 250, 0.06);
+      bottom: 100px; right: -100px;
+    }
+
+    /* ── Page wrapper ── */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .back-link:hover { color: var(--text-primary); }
+
+    /* ── Main content ── */
+    .main-content {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 64px 48px 96px;
+    }
+
+    /* ── Hero text ── */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(79, 142, 247, 0.1);
+      border: 1px solid rgba(79, 142, 247, 0.25);
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Track cards grid ── */
+    .tracks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Card base ── */
+    .track-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .track-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .track-card.blue::before {
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    }
+    .track-card.purple::before {
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+    }
+
+    .track-card:hover {
+      transform: translateY(-6px);
+    }
+    .track-card.blue:hover {
+      border-color: rgba(79, 142, 247, 0.45);
+      box-shadow: 0 20px 60px rgba(79, 142, 247, 0.12), 0 0 0 1px rgba(79, 142, 247, 0.15);
+    }
+    .track-card.purple:hover {
+      border-color: rgba(167, 139, 250, 0.45);
+      box-shadow: 0 20px 60px rgba(167, 139, 250, 0.12), 0 0 0 1px rgba(167, 139, 250, 0.15);
+    }
+    .track-card:hover::before { opacity: 1; }
+
+    /* Card icon area */
+    .card-icon-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-icon.blue { background: rgba(79, 142, 247, 0.12); }
+    .card-icon.purple { background: rgba(167, 139, 250, 0.12); }
+    .card-icon svg { width: 26px; height: 26px; }
+    .card-icon.blue svg { color: var(--blue); }
+    .card-icon.purple svg { color: var(--purple); }
+
+    .card-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .card-badge.blue {
+      color: var(--blue);
+      background: rgba(79, 142, 247, 0.1);
+      border: 1px solid rgba(79, 142, 247, 0.2);
+    }
+    .card-badge.purple {
+      color: var(--purple);
+      background: rgba(167, 139, 250, 0.1);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+    }
+
+    /* Card body */
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+
+    .card-description {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    /* Feature pills */
+    .pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .feature-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.02em;
+    }
+    .feature-pill.blue {
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--blue);
+      border: 1px solid rgba(79, 142, 247, 0.18);
+    }
+    .feature-pill.purple {
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--purple);
+      border: 1px solid rgba(167, 139, 250, 0.18);
+    }
+
+    /* CTA button */
+    .card-cta {
+      margin-top: auto;
+    }
+
+    .btn-launch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+      letter-spacing: 0.01em;
+    }
+    .btn-launch:active { transform: scale(0.97); }
+
+    .btn-launch.blue {
+      color: var(--blue);
+      border-color: rgba(79, 142, 247, 0.4);
+    }
+    .btn-launch.blue:hover {
+      background: rgba(79, 142, 247, 0.1);
+      border-color: var(--blue);
+    }
+
+    .btn-launch.purple {
+      color: var(--purple);
+      border-color: rgba(167, 139, 250, 0.4);
+    }
+    .btn-launch.purple:hover {
+      background: rgba(167, 139, 250, 0.1);
+      border-color: var(--purple);
+    }
+
+    .btn-arrow {
+      transition: transform 0.2s ease;
+    }
+    .btn-launch:hover .btn-arrow { transform: translateX(4px); }
+
+    /* ── Grand Challenge card ── */
+    .grand-card-wrapper {
+      position: relative;
+      padding: 2px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--blue) 0%, transparent 50%, var(--purple) 100%);
+    }
+
+    .grand-card {
+      background: var(--bg-card);
+      border-radius: 26px;
+      padding: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grand-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(79,142,247,0.04) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(167,139,250,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .grand-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .grand-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 5px 14px;
+      border-radius: 100px;
+      background: linear-gradient(90deg, rgba(79,142,247,0.15), rgba(167,139,250,0.15));
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-primary);
+    }
+
+    .grand-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .grand-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 580px;
+    }
+
+    .grand-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin: 36px 0;
+    }
+
+    .grand-col-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .grand-col-label.blue { color: var(--blue); }
+    .grand-col-label.purple { color: var(--purple); }
+
+    .grand-col-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .grand-col-dot.blue { background: var(--blue); }
+    .grand-col-dot.purple { background: var(--purple); }
+
+    .grand-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .grand-feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .feat-check {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feat-check.blue { background: rgba(79, 142, 247, 0.15); }
+    .feat-check.purple { background: rgba(167, 139, 250, 0.15); }
+    .feat-check svg { width: 9px; height: 9px; }
+    .feat-check.blue svg { color: var(--blue); }
+    .feat-check.purple svg { color: var(--purple); }
+
+    .grand-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-launch-gradient {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-sans);
+      font-size: 0.925rem;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+      letter-spacing: 0.01em;
+    }
+    .btn-launch-gradient:hover { opacity: 0.88; }
+    .btn-launch-gradient:active { transform: scale(0.97); }
+    .btn-launch-gradient .btn-arrow { transition: transform 0.2s ease; }
+    .btn-launch-gradient:hover .btn-arrow { transform: translateX(4px); }
+
+    .grand-note {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Page fade in ── */
+    body {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .tracks-grid { grid-template-columns: 1fr; }
+      .grand-features { grid-template-columns: 1fr; gap: 24px; }
+      .main-content { padding: 40px 24px 72px; }
+      .header { padding: 20px 24px; }
+      .track-card { padding: 32px; }
+      .grand-card { padding: 36px 28px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-title { font-size: 1.75rem; }
+      .header { padding: 16px 20px; }
+      .track-card { padding: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background glows -->
+  <div class="bg-glow bg-glow-blue"></div>
+  <div class="bg-glow bg-glow-purple"></div>
+
+  <div class="page-wrapper">
+
+    <!-- ── Header ── -->
+    <header class="header">
+      <a href="index.html" class="logo-link">
+        <svg viewBox="0 0 100 100" class="logo-icon" fill="none">
+          <circle cx="50" cy="50" r="16" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="50" cy="28" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <circle cx="69" cy="39" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <circle cx="69" cy="61" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <circle cx="50" cy="72" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <circle cx="31" cy="61" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <circle cx="31" cy="39" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        </svg>
+        <span class="logo-text">Creatrix AI</span>
+      </a>
+
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Home
+      </a>
+    </header>
+
+    <!-- ── Main ── -->
+    <main class="main-content">
+
+      <!-- Hero -->
+      <section class="hero-section">
+        <div class="hero-tag">Grand Challenge 2026</div>
+        <h1 class="hero-title">Choose Your Intelligence Track</h1>
+        <p class="hero-subtitle">Power your strategy with AI — pick a track to begin</p>
+      </section>
+
+      <!-- Two track cards -->
+      <div class="tracks-grid">
+
+        <!-- Track 01 -->
+        <div class="track-card blue" onclick="launchTrack(1)">
+          <div class="card-icon-row">
+            <div class="card-icon blue">
+              <!-- Target / radar icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+                <line x1="22" y1="12" x2="18" y2="12"/>
+                <line x1="6" y1="12" x2="2" y2="12"/>
+                <line x1="12" y1="6" x2="12" y2="2"/>
+                <line x1="12" y1="22" x2="12" y2="18"/>
+              </svg>
+            </div>
+            <span class="card-badge blue">TRACK 01</span>
+          </div>
+
+          <div>
+            <h2 class="card-title">AI Influencer Intelligence Engine</h2>
+          </div>
+
+          <p class="card-description">
+            Discover, score, and predict high-performing creators using ensemble ML. Detect fake followers, predict growth, and match brands with precision.
+          </p>
+
+          <div class="pills-row">
+            <span class="feature-pill blue">Ratefluencer Score™</span>
+            <span class="feature-pill blue">Authenticity Detection</span>
+            <span class="feature-pill blue">Growth Predictor</span>
+            <span class="feature-pill blue">Brand Matcher</span>
+          </div>
+
+          <div class="card-cta">
+            <button class="btn-launch blue" onclick="event.stopPropagation(); launchTrack(1)">
+              Launch Track 01
+              <svg class="btn-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Track 02 -->
+        <div class="track-card purple" onclick="launchTrack(2)">
+          <div class="card-icon-row">
+            <div class="card-icon purple">
+              <!-- Play / reel icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <span class="card-badge purple">TRACK 02</span>
+          </div>
+
+          <div>
+            <h2 class="card-title">AI Viral Reel Creator Agent</h2>
+          </div>
+
+          <p class="card-description">
+            Discover trending topics, generate viral scripts, create LinkedIn posts, Instagram captions, and predict content virality before you publish.
+          </p>
+
+          <div class="pills-row">
+            <span class="feature-pill purple">Trend Discovery</span>
+            <span class="feature-pill purple">Script Generator</span>
+            <span class="feature-pill purple">Reel Builder</span>
+            <span class="feature-pill purple">Virality Predictor</span>
+          </div>
+
+          <div class="card-cta">
+            <button class="btn-launch purple" onclick="event.stopPropagation(); launchTrack(2)">
+              Launch Track 02
+              <svg class="btn-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Grand Challenge card -->
+      <div class="grand-card-wrapper">
+        <div class="grand-card">
+          <div class="grand-header">
+            <div>
+              <span class="grand-badge">GRAND CHALLENGE</span>
+            </div>
+          </div>
+
+          <h2 class="grand-title">Build the Future of AI-Powered Influence</h2>
+          <p class="grand-subtitle">Both tracks unified. Full influencer intelligence + viral content creation in one complete ecosystem.</p>
+
+          <div class="grand-features">
+            <div>
+              <div class="grand-col-label blue">
+                <span class="grand-col-dot blue"></span>
+                Track 01 — Influencer Intelligence
+              </div>
+              <ul class="grand-feature-list">
+                <li>
+                  <span class="feat-check blue">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Ratefluencer Score™ ensemble model
+                </li>
+                <li>
+                  <span class="feat-check blue">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Fake follower &amp; bot detection
+                </li>
+                <li>
+                  <span class="feat-check blue">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Growth curve forecasting
+                </li>
+                <li>
+                  <span class="feat-check blue">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Brand–creator RAG matcher
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div class="grand-col-label purple">
+                <span class="grand-col-dot purple"></span>
+                Track 02 — Viral Content Creation
+              </div>
+              <ul class="grand-feature-list">
+                <li>
+                  <span class="feat-check purple">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Real-time trend discovery feeds
+                </li>
+                <li>
+                  <span class="feat-check purple">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Multi-agent viral script generator
+                </li>
+                <li>
+                  <span class="feat-check purple">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  LinkedIn &amp; Instagram content AI
+                </li>
+                <li>
+                  <span class="feat-check purple">
+                    <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 5l2 2 4-4"/>
+                    </svg>
+                  </span>
+                  Pre-publish virality predictor
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="grand-cta-row">
+            <button class="btn-launch-gradient" onclick="launchTrack('both')">
+              Launch Full Platform
+              <svg class="btn-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+            <span class="grand-note">Includes all Track 01 + Track 02 modules</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Page fade in
+    document.addEventListener('DOMContentLoaded', () => {
+      requestAnimationFrame(() => { document.body.style.opacity = '1'; });
+    });
+
+    function launchTrack(track) {
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        window.location.href = `dashboard.html?track=${track}`;
+      }, 350);
+    }
+  </script>
+</body>
+</html>

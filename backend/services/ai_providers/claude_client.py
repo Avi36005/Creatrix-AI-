@@ -13,7 +13,7 @@ class ClaudeClient:
     MODEL = "claude-sonnet-4-20250514"
 
     def __init__(self):
-        self.api_key = settings.ANTHROPIC_API_KEY
+        self.api_key = getattr(settings, "ANTHROPIC_API_KEY", "")
 
     async def complete(self, system: str, user: str, max_tokens: int = 1500) -> str:
         if not self.api_key or self.api_key.startswith("sk-ant-..."):

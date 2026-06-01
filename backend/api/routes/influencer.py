@@ -9,11 +9,11 @@ from pydantic import BaseModel
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from services.track01_intelligence.ratefluencer_score import RatefluencerScoringEngine
-from services.ai_providers.claude_client import ClaudeClient
+from services.ai_providers.gemini_client import GeminiClient
 
 router = APIRouter()
 engine = RatefluencerScoringEngine()
-claude = ClaudeClient()
+gemini = GeminiClient()
 
 _DATA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -152,13 +152,12 @@ async def analyze_influencer(request: AnalyzeRequest):
         avg_comments=metrics["avg_comments"],
     )
 
-    summary = await claude.complete(
-        system="You are an expert influencer marketing analyst. Write concise, data-driven summaries.",
+    summary = await gemini.complete(
+        system="You are an expert influencer marketing strategist. Give a 2-sentence strategic assessment.",
         user=(
-            f"Summarize this influencer in 2 sentences for a brand manager: "
-            f"Handle: {request.handle}, Platform: {request.platform}, "
-            f"Followers: {metrics['followers']:,}, Engagement: {metrics['engagement_rate']}%, "
-            f"Ratefluencer Score: {scores['ratefluencer_score']}/100, Niche: {niche}."
+            f"Influencer: {request.handle}, Ratefluencer Score: {scores['ratefluencer_score']}, "
+            f"Niche: {niche}, Followers: {metrics['followers']:,}, "
+            f"Platform: {request.platform}, Engagement: {metrics['engagement_rate']}%."
         ),
         max_tokens=200,
     )

@@ -7,7 +7,7 @@ from typing import AsyncGenerator
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from services.track01_intelligence.ratefluencer_score import RatefluencerScoringEngine
 from services.track02_content.script_generator import ScriptGenerator
-from services.ai_providers.claude_client import ClaudeClient
+from services.ai_providers.gemini_client import GeminiClient
 
 # ── Optional LangGraph import ────────────────────────────────────────────────
 try:
@@ -78,7 +78,7 @@ class ViraNovaAgent:
     def __init__(self):
         self.engine = RatefluencerScoringEngine()
         self.generator = ScriptGenerator()
-        self.claude = ClaudeClient()
+        self.gemini = GeminiClient()
 
     async def stream_workflow(
         self, task: str, handle: str, platform: str

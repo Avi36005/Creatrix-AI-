@@ -34,7 +34,7 @@ async def startup_event():
     print("Creatrix AI — ViraNova API starting up")
     print(f"  Environment : {settings.APP_ENV}")
     print(f"  Port        : {settings.PORT}")
-    print(f"  Claude key  : {'configured' if settings.ANTHROPIC_API_KEY and not settings.ANTHROPIC_API_KEY.startswith('sk-ant-...') else 'not configured (using fallbacks)'}")
+    print(f"  Gemini key  : {'configured' if settings.GEMINI_API_KEY else 'not configured (using fallbacks)'}")
     print(f"  Groq key    : {'configured' if settings.GROQ_API_KEY and not settings.GROQ_API_KEY.startswith('gsk_...') else 'not configured'}")
     print("=" * 60)
 

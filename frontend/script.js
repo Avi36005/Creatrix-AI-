@@ -542,11 +542,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('loaded');
   });
 
-  const transitionLinks = document.querySelectorAll('a[href="dashboard.html"], a[href="index.html"], .cta-button, .about-learn-more-link, .contact-faq-btn, .footer-cta-btn');
+  const transitionLinks = document.querySelectorAll('a[href="tracks.html"], a[href="dashboard.html"], a[href="index.html"], .about-learn-more-link, .contact-faq-btn');
   transitionLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
-      if (href && (href.includes('dashboard.html') || href.includes('index.html'))) {
+      if (href && (href.includes('tracks.html') || href.includes('dashboard.html') || href.includes('index.html'))) {
         e.preventDefault();
         document.body.classList.remove('loaded');
         setTimeout(() => {
@@ -618,6 +618,76 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1800);
     });
   }
+
+  // --- PLATFORM LAUNCH LOADING SCREEN ---
+  window.launchPlatform = function() {
+    // Create full-screen overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'launch-overlay';
+    Object.assign(overlay.style, {
+      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+      background: '#01050e', zIndex: '99999', display: 'flex',
+      flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      opacity: '0', transition: 'opacity 0.3s ease'
+    });
+
+    overlay.innerHTML = `
+      <div style="text-align:center;max-width:480px;padding:40px;">
+        <svg viewBox="0 0 100 100" style="width:64px;height:64px;color:#4F8EF7;margin-bottom:28px;animation:spin 2s linear infinite;">
+          <circle cx="50" cy="50" r="16" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <circle cx="50" cy="28" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="69" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="69" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="50" cy="72" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="31" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <circle cx="31" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+        </svg>
+        <div style="font-family:'DM Sans',sans-serif;font-size:1.1rem;font-weight:500;color:#f1f5f9;margin-bottom:8px;" id="launch-status">Booting Creatrix AI Engine...</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#4F8EF7;margin-bottom:32px;" id="launch-pct">0%</div>
+        <div style="width:320px;height:3px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;">
+          <div id="launch-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4F8EF7,#A78BFA);border-radius:100px;transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+    `;
+
+    // Add spin animation
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+
+    // Fade in overlay
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+
+    const steps = [
+      { pct: 20, msg: 'Booting Creatrix AI Engine...' },
+      { pct: 40, msg: 'Loading Influencer Intelligence Models...' },
+      { pct: 60, msg: 'Connecting Trend Discovery Feeds...' },
+      { pct: 80, msg: 'Preparing Viral Content Engine...' },
+      { pct: 100, msg: 'Welcome to Creatrix AI ✓' }
+    ];
+
+    let i = 0;
+    const bar = document.getElementById('launch-bar');
+    const statusEl = document.getElementById('launch-status');
+    const pctEl = document.getElementById('launch-pct');
+
+    const tick = () => {
+      if (i >= steps.length) {
+        setTimeout(() => {
+          overlay.style.opacity = '0';
+          setTimeout(() => window.location.href = 'tracks.html', 300);
+        }, 400);
+        return;
+      }
+      const step = steps[i++];
+      bar.style.width = step.pct + '%';
+      statusEl.textContent = step.msg;
+      pctEl.textContent = step.pct + '%';
+      setTimeout(tick, 480);
+    };
+    tick();
+  };
 
   startLoader();
 });

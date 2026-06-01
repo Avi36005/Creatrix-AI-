@@ -2,12 +2,12 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from services.ai_providers.claude_client import ClaudeClient
+from services.ai_providers.gemini_client import GeminiClient
 
 
 class ScriptGenerator:
     def __init__(self):
-        self.claude = ClaudeClient()
+        self.gemini = GeminiClient()
 
     async def generate(self, topic: str, duration: int = 30, style: str = "hooks") -> dict:
         system = (
@@ -22,7 +22,7 @@ class ScriptGenerator:
             f"\"cta\": \"(25-{duration}s, engagement CTA)\", "
             f"\"virality_tips\": [\"tip1\", \"tip2\", \"tip3\"]}}"
         )
-        result = await self.claude.complete_json(system, user)
+        result = await self.gemini.complete_json(system, user, max_tokens=1000)
         if not result:
             result = self._fallback_script(topic, duration, style)
         return result
@@ -38,7 +38,7 @@ class ScriptGenerator:
             f"\"expected_likes\": int, \"expected_shares\": int, \"expected_saves\": int, "
             f"\"grade\": \"A/B/C/D\", \"recommendation\": \"one sentence\"}}"
         )
-        result = await self.claude.complete_json(system, user)
+        result = await self.gemini.complete_json(system, user, max_tokens=1000)
         if not result:
             result = self._fallback_virality(script_text, platform)
         return result
@@ -57,7 +57,7 @@ class ScriptGenerator:
             "\"hook_line\": \"first sentence\", "
             "\"engagement_tip\": \"one tip to maximize comments\"}"
         )
-        result = await self.claude.complete_json(system, user)
+        result = await self.gemini.complete_json(system, user, max_tokens=1000)
         if not result:
             result = self._fallback_linkedin(topic, audience)
         return result
@@ -75,7 +75,7 @@ class ScriptGenerator:
             "\"#tag6\",\"#tag7\",\"#tag8\",\"#tag9\",\"#tag10\"], "
             "\"hook\": \"first line only\"}"
         )
-        result = await self.claude.complete_json(system, user)
+        result = await self.gemini.complete_json(system, user, max_tokens=1000)
         if not result:
             result = self._fallback_instagram(topic, style)
         return result

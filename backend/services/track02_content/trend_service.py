@@ -4,7 +4,7 @@ import json
 import hashlib
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from services.ai_providers.claude_client import ClaudeClient
+from services.ai_providers.gemini_client import GeminiClient
 
 _DATA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -54,7 +54,7 @@ _HOOKS = {
 
 class TrendService:
     def __init__(self):
-        self.claude = ClaudeClient()
+        self.gemini = GeminiClient()
 
     async def discover_trends(self, category: str = "all", limit: int = 10) -> list:
         raw = _load_sample_trends()
