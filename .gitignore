@@ -1,11 +1,31 @@
-backend/.env
+﻿# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
-.DS_Store
-*.egg-info/
-dist/
-build/
 .venv/
 venv/
+env/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+keyss.txt
+
+# Database
+*.db
+*.sqlite3
+
+# Mac
+.DS_Store
+__MACOSX/
+
+# Node
 node_modules/
+.firebase/
+.firebaserc
+
+# Build
+dist/
+build/
+*.log
