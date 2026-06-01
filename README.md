@@ -19,7 +19,7 @@
 
 **Track 01 · Track 02 · Grand Challenge** — Built for all three tracks in 48 hours.
 
-[**Live Demo**](https://mediflow-nexus-2026.web.app) · [**API Docs**](https://creatrix-ai-backend-3692981377.us-central1.run.app/docs) · [**GitHub**](https://github.com/Avi36005/Creatrix-AI)
+[**Live Demo**](https://creatrixai.web.app) · [**API Docs**](https://creatrix-ai-backend-3692981377.us-central1.run.app/docs) · [**GitHub**](https://github.com/Avi36005/Creatrix-AI)
 
 </div>
 
