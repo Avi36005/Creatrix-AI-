@@ -56,7 +56,7 @@ body {
    HERO BACKGROUND — Quantix Reference Match
    ============================================= */
 
-/* Layer 1 — Base: Dark navy top → steel-blue bottom */
+/* Layer 1 — Base: Dark navy top → light blue horizon bottom */
 .background-container {
   position: fixed;
   top: 0;
@@ -67,19 +67,20 @@ body {
   overflow: hidden;
   background-color: #030a18;
   background-image:
-    /* Dark center halftone dot overlay */
-    radial-gradient(ellipse 70% 60% at 50% 0%, 
-      rgba(8, 14, 28, 0.85) 0%, 
-      rgba(8, 14, 28, 0.4) 50%, 
-      transparent 80%
+    /* Dark vignette overlay — keeps top corners very dark */
+    radial-gradient(ellipse 90% 55% at 50% 0%,
+      rgba(3, 10, 24, 0.96) 0%,
+      rgba(3, 10, 24, 0.55) 45%,
+      transparent 78%
     ),
-    /* Core blue radial glow */
-    radial-gradient(ellipse 120% 90% at 50% -10%,
-      #2a4a7a 0%,
-      #1e3a6e 20%,
-      #16305e 40%,
-      #0e2040 60%,
-      #071428 80%,
+    /* Main blue horizon glow — light source from bottom-center */
+    radial-gradient(ellipse 140% 90% at 50% 108%,
+      #5a92c8 0%,
+      #3a6898 15%,
+      #2a4e80 30%,
+      #1e3a6e 48%,
+      #0e2040 68%,
+      #071428 84%,
       #030a18 100%
     );
 }
@@ -100,19 +101,50 @@ body {
   mix-blend-mode: screen;
 }
 
-/* Layer 2a — LEFT CORNER glow: whitish-blue at bottom-left corner */
+/* Layer 2a — LEFT CORNER glow */
 .glow-bottom-left {
-  display: none;
+  display: block;
+  width: 680px;
+  height: 680px;
+  bottom: -160px;
+  left: -120px;
+  background: radial-gradient(circle,
+    rgba(80, 150, 210, 0.50) 0%,
+    rgba(50, 100, 170, 0.22) 45%,
+    transparent 72%
+  );
+  filter: blur(56px);
 }
 
-/* Layer 2b — RIGHT CORNER glow: whitish-blue at bottom-right corner */
+/* Layer 2b — RIGHT CORNER glow */
 .glow-bottom-right {
-  display: none;
+  display: block;
+  width: 680px;
+  height: 680px;
+  bottom: -160px;
+  right: -120px;
+  background: radial-gradient(circle,
+    rgba(80, 150, 210, 0.50) 0%,
+    rgba(50, 100, 170, 0.22) 45%,
+    transparent 72%
+  );
+  filter: blur(56px);
 }
 
-/* Layer 3 — WAVE connecting both corners across the bottom */
+/* Layer 3 — Centre wave connecting both corner glows */
 .glow-center-wave {
-  display: none;
+  display: block;
+  width: 100%;
+  height: 360px;
+  bottom: -80px;
+  left: 0;
+  border-radius: 0;
+  background: radial-gradient(ellipse 80% 100% at 50% 100%,
+    rgba(74, 140, 210, 0.30) 0%,
+    rgba(40, 80, 150, 0.12) 50%,
+    transparent 78%
+  );
+  filter: blur(40px);
 }
 
 /* Edge Lighting — subtle vertical framing */
@@ -148,27 +180,29 @@ body {
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Layer 4 — Dot Matrix: fine dots, slight rotation, fading top */
+/* Layer 4 — Dot Matrix: visible in dark upper area, fade toward bright bottom */
 .halftone-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: center top;
-  opacity: 0.8;
-  /* Fade dots: dark center, fade at edges */
-  -webkit-mask-image: radial-gradient(
-    ellipse 80% 70% at 50% 20%, 
-    rgba(0,0,0,0.9) 0%, 
-    rgba(0,0,0,0.6) 40%, 
-    transparent 75%
+  opacity: 1;
+  /* Visible in upper area, fade out before the bright blue bottom */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.9) 0%,
+    rgba(0,0,0,0.75) 35%,
+    rgba(0,0,0,0.2) 65%,
+    transparent 85%
   );
-  mask-image: radial-gradient(
-    ellipse 80% 70% at 50% 20%, 
-    rgba(0,0,0,0.9) 0%, 
-    rgba(0,0,0,0.6) 40%, 
-    transparent 75%
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.9) 0%,
+    rgba(0,0,0,0.75) 35%,
+    rgba(0,0,0,0.2) 65%,
+    transparent 85%
   );
 }
 
