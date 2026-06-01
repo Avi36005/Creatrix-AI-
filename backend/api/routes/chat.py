@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -16,8 +17,27 @@ SYSTEM_PROMPT = (
     "it analyzes any creator's REAL YouTube data to compute a Ratefluencer Score, "
     "detects fake followers, predicts growth, matches brands, discovers live trends, "
     "and generates reel scripts, LinkedIn posts, Instagram captions, and ElevenLabs voiceovers. "
-    "Answer concisely and helpfully, guiding the user through the dashboard."
+    "Answer concisely and helpfully, guiding the user through the dashboard. "
+    "Reply in PLAIN TEXT only — do NOT use markdown, asterisks (*), pound/hash signs (#), "
+    "bold, headings, or bullet symbols. Use plain sentences and, if listing, plain numbers like 1. 2. 3."
 )
+
+
+def _clean_reply(text: str) -> str:
+    """Strip markdown so the chat bubble (rendered as plain text) never shows
+    stray * or # characters."""
+    if not text:
+        return text
+    # Drop heading markers at line starts (e.g. "## Title").
+    text = re.sub(r"(?m)^\s{0,3}#{1,6}\s*", "", text)
+    # Turn markdown bullets into a clean bullet glyph before removing markers.
+    text = re.sub(r"(?m)^\s*[\*\-\+]\s+", "• ", text)
+    # Remove emphasis wrappers and any remaining * / # characters.
+    text = text.replace("**", "").replace("__", "")
+    text = text.replace("*", "").replace("#", "")
+    # Collapse excess blank lines left behind.
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 
 class ChatRequest(BaseModel):
@@ -41,7 +61,7 @@ async def chat(request: ChatRequest):
         reply = await GroqClient().complete(SYSTEM_PROMPT, user, max_tokens=500)
         if not reply or not reply.strip():
             reply = "I'm here to help! Please try again in a moment."
-        return {"status": "success", "reply": reply.strip()}
+        return {"status": "success", "reply": _clean_reply(reply)}
     except Exception:
         return {
             "status": "success",
