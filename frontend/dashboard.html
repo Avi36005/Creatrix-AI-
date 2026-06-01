@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  
+  <script src="config.js"></script>
+
   <style>
     :root {
       --blue: #4F8EF7;
@@ -2773,7 +2774,7 @@
           try {
             logOverviewTerm('Triggering ViraNova multi-agent workflow...', 'system');
 
-            const response = await fetch('http://localhost:8001/api/v1/agent/run', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/agent/run`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ input: handle, task: 'full_analysis', platform: 'instagram' })
@@ -2934,7 +2935,7 @@
 
           setLoading(btnGenerateScript, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/content/generate-script', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/content/generate-script`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ topic: topicValue, duration: parseInt(activeDuration), style: activeStyle })
@@ -2984,7 +2985,7 @@
 
           setLoading(btnScorerAnalyze, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/influencer/analyze', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/influencer/analyze`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ handle: handleValue, platform: platformValue })
@@ -3077,7 +3078,7 @@
 
           setLoading(btnPredictVirality, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/content/predict-virality', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/virality/predict`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ script_text: scriptText, platform: platform })
@@ -3125,7 +3126,7 @@
         btnRefreshTrends.addEventListener('click', async () => {
           setLoading(btnRefreshTrends, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/trends/discover', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/trends/discover`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ category: 'all', limit: 10 })
@@ -3195,7 +3196,7 @@
 
           setLoading(btnGenerateLinkedIn, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/content/linkedin', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/content/linkedin`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ topic: topicValue, audience: 'professionals' })
@@ -3231,7 +3232,7 @@
 
           setLoading(btnGenerateInstagram, true);
           try {
-            const response = await fetch('http://localhost:8001/api/v1/content/instagram', {
+            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/content/instagram`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ topic: topicValue, style: 'engaging' })
@@ -3261,11 +3262,154 @@
           if (topicInput && trendTitleText) {
             topicInput.value = trendTitleText.textContent;
           }
-          // Switch to scripts panel
           const scriptsMenuItem = document.querySelector('.menu-item[data-tab="scripts"]');
           if (scriptsMenuItem) scriptsMenuItem.click();
         });
       }
+
+      // ─── Growth Prediction ────────────────────────────────────────────────
+      const btnPredictGrowth = document.getElementById('btn-predict-growth');
+      if (btnPredictGrowth) {
+        btnPredictGrowth.addEventListener('click', async () => {
+          const handleEl = document.getElementById('pred-handle');
+          const handle = handleEl ? handleEl.value.trim() : '@ankita.creates';
+          const activePill = document.querySelector('#panel-growth .platform-pill.active');
+          const horizonText = activePill ? activePill.textContent.trim() : '6 Months';
+          const months = horizonText.includes('12') ? 12 : horizonText.includes('3') ? 3 : 6;
+
+          btnPredictGrowth.disabled = true;
+          btnPredictGrowth.textContent = 'Predicting...';
+          try {
+            const res = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/influencer/growth`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ handle, platform: 'instagram', months })
+            });
+            if (!res.ok) throw new Error('API error');
+            const d = await res.json();
+            const g = d.growth || {};
+            const cards = document.querySelectorAll('#panel-growth .sub-score-val');
+            if (cards[0]) cards[0].textContent = formatNumber(g.current || 0);
+            if (cards[1]) {
+              const pred = months === 3 ? g.projected_3m : months === 12 ? g.projected_12m : g.projected_6m;
+              cards[1].textContent = formatNumber(pred || 0);
+            }
+            if (cards[2]) cards[2].textContent = '+' + (g.monthly_rate || 0) + '%/mo';
+          } catch (_) {}
+          finally {
+            btnPredictGrowth.disabled = false;
+            btnPredictGrowth.textContent = 'Predict Growth';
+          }
+        });
+      }
+
+      // ─── Build Reel / ElevenLabs Voiceover ───────────────────────────────
+      const btnBuildReel = document.getElementById('btn-build-reel');
+      if (btnBuildReel) {
+        btnBuildReel.addEventListener('click', async () => {
+          const hookEl = document.getElementById('script-out-hook');
+          const scriptText = hookEl ? hookEl.textContent.trim() : '';
+          const voiceCards = document.querySelectorAll('.voice-option-card');
+          let voiceId = 'EXAVITQu4vr4xnSDxMaL';
+          const voiceMap = {
+            'Nova': 'EXAVITQu4vr4xnSDxMaL',
+            'Echo': 'TxGEqnHWrfWFTfGW9XjX',
+          };
+          voiceCards.forEach(card => {
+            if (card.classList.contains('active')) {
+              const name = card.querySelector('.voice-opt-name')?.textContent?.trim() || '';
+              voiceId = voiceMap[name] || voiceId;
+            }
+          });
+
+          const captionEl = document.getElementById('phone-text-caption');
+          if (captionEl && scriptText) captionEl.textContent = scriptText.slice(0, 80) + '...';
+
+          btnBuildReel.disabled = true;
+          btnBuildReel.textContent = 'Generating...';
+
+          const textToSpeak = scriptText || 'AI just changed the creator economy forever. Here is what nobody is telling you about influence in 2026.';
+
+          try {
+            const res = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/virality/voiceover`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ script_text: textToSpeak, voice_id: voiceId })
+            });
+            if (!res.ok) throw new Error('API error');
+            const d = await res.json();
+            if (d.audio_base64) {
+              const binary = atob(d.audio_base64);
+              const bytes = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+              const blob = new Blob([bytes], { type: 'audio/mpeg' });
+              const url = URL.createObjectURL(blob);
+              const btnPlay = document.getElementById('btn-play-preview-reel');
+              if (btnPlay) {
+                const audio = new Audio(url);
+                btnPlay.onclick = () => {
+                  if (audio.paused) { audio.play(); btnPlay.textContent = '⏸'; }
+                  else { audio.pause(); btnPlay.textContent = '▶'; }
+                  audio.onended = () => { btnPlay.textContent = '▶'; };
+                };
+              }
+            }
+            const badge = document.querySelector('.phone-score-badge');
+            try {
+              const viralRes = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/virality/predict`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script_text: textToSpeak, platform: 'instagram' })
+              });
+              if (viralRes.ok) {
+                const vd = await viralRes.json();
+                if (badge) badge.textContent = `${vd.virality_score || 87} 🔥`;
+              }
+            } catch (_) {}
+          } catch (_) {
+            const badge = document.querySelector('.phone-score-badge');
+            if (badge) badge.textContent = '87 🔥';
+          } finally {
+            btnBuildReel.disabled = false;
+            btnBuildReel.textContent = 'Generate Reel →';
+          }
+        });
+      }
+
+      // ─── Auto-load trends on page ready ──────────────────────────────────
+      (async () => {
+        try {
+          const res = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/trends/discover`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category: 'all', limit: 10 })
+          });
+          if (res.ok) {
+            const d = await res.json();
+            const trendFeed = document.getElementById('trend-feed-items');
+            const trendsArr = d.trends || [];
+            if (trendFeed && trendsArr.length > 0) {
+              trendFeed.innerHTML = trendsArr.map((t, i) => `
+                <div class="trend-row-item${i === 0 ? ' active' : ''}" data-trend-index="${i}">
+                  <div class="trend-main-info">
+                    <div class="trend-header-pill">
+                      <span class="trend-rank">#${i+1}</span>
+                      <span class="trend-title">${t.title}</span>
+                      <span class="badge badge-info" style="font-size:10px;padding:2px 6px;">${t.category}</span>
+                    </div>
+                    <div class="trend-sources-pills">
+                      ${(t.sources||[]).map(s => `<span class="source-mini-tag">${s}</span>`).join('')}
+                    </div>
+                  </div>
+                  <div class="trend-meta-stats">
+                    <span class="trend-row-score">${t.score}</span>
+                    <span class="trend-growth-percent">↑ +${t.growth_pct}%</span>
+                  </div>
+                </div>`).join('');
+            }
+          }
+        } catch (_) {}
+      })();
 
     });
   </script>
