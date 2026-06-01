@@ -1162,6 +1162,163 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* =================================================================
+       AWARD-WINNING POLISH — blue & white refinement (override layer)
+       ================================================================= */
+
+    :root {
+      --blue: #3B82F6;
+      --blue-deep: #2563EB;
+      --blue-soft: #EFF5FF;
+      --ink: #0B1220;
+      --ink-soft: #5A6678;
+      --line: #EAEEF5;
+      --shadow-sm: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+      --shadow-md: 0 4px 12px rgba(16,24,40,0.06), 0 12px 28px rgba(16,24,40,0.05);
+      --shadow-lg: 0 8px 24px rgba(16,24,40,0.08), 0 24px 48px rgba(16,24,40,0.07);
+    }
+
+    /* Unify fonts — DM Sans everywhere, Syne only for major headings */
+    body { font-family: var(--font-sans); letter-spacing: -0.01em;
+      background:
+        radial-gradient(900px 500px at 100% -5%, rgba(59,130,246,0.05), transparent 60%),
+        radial-gradient(700px 400px at -5% 0%, rgba(59,130,246,0.04), transparent 55%),
+        #F7F9FC;
+    }
+
+    .metric-val, .sub-score-val, .arc-value,
+    [style*="var(--font-mono)"][style*="20px"],
+    [style*="var(--font-mono)"][style*="28px"] {
+      font-family: var(--font-sans) !important;
+      font-feature-settings: "tnum" 1;
+      letter-spacing: -0.03em !important;
+      font-weight: 700 !important;
+    }
+
+    /* ---- Sidebar: deep premium navy with glow active state ---- */
+    aside {
+      background:
+        radial-gradient(420px 200px at 30% 0%, rgba(59,130,246,0.14), transparent 70%),
+        linear-gradient(180deg, #0A1020 0%, #070C18 100%);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 26px 14px;
+    }
+    .brand-logo { margin-bottom: 30px; }
+    .brand-name { font-family: var(--font-serif); letter-spacing: -0.4px; }
+    .nav-group-label { color: rgba(255,255,255,0.30); font-size: 10px; letter-spacing: 1.6px; }
+    .menu-item {
+      border-radius: 11px;
+      padding: 11px 14px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.62);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.06); color: #fff; transform: translateX(2px); }
+    .menu-item.active {
+      background: linear-gradient(90deg, rgba(59,130,246,0.22), rgba(59,130,246,0.08));
+      color: #fff;
+      border-left: none;
+      border-radius: 11px;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(99,160,255,0.30), 0 6px 16px rgba(37,99,235,0.18);
+    }
+    .menu-item.active svg { color: #79A8FF; }
+
+    /* ---- Header ---- */
+    main { padding: 38px 44px; gap: 28px; }
+    .header-left h1 { font-family: var(--font-serif); font-size: 30px; letter-spacing: -0.6px; }
+    .date-badge { box-shadow: var(--shadow-sm); font-weight: 500; }
+    .track-toggle { background: #fff; box-shadow: var(--shadow-sm); border-color: var(--line); }
+
+    /* ---- Metric cards: gradient top-accent + clean numbers ---- */
+    .metric-card {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), #8Fb8FF);
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    .metric-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+    .metric-card:hover::before { opacity: 1; }
+    .metric-title { color: var(--ink-soft); font-size: 11px; letter-spacing: 0.8px; }
+    .metric-val { font-size: 34px; color: var(--ink); }
+
+    /* ---- Cards: softer, larger radius, layered shadow ---- */
+    .white-card {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      padding: 30px;
+      transition: box-shadow 0.25s ease;
+    }
+    .white-card:hover { box-shadow: var(--shadow-md); }
+    .panel-header h2, .white-card h2 { font-family: var(--font-serif); letter-spacing: -0.4px; }
+
+    /* ---- Sub-score cards ---- */
+    .sub-score-card {
+      border-radius: 14px;
+      background: linear-gradient(180deg, #FBFCFE, #F4F7FC);
+      border: 1px solid var(--line);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .sub-score-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .sub-score-val { font-size: 30px; }
+
+    /* ---- Buttons: premium gradient + glow ---- */
+    .btn-action {
+      background: linear-gradient(180deg, #4C90F9, var(--blue-deep));
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(37,99,235,0.25), 0 6px 16px rgba(37,99,235,0.22);
+    }
+    .btn-action:hover { filter: none; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,99,235,0.30); }
+
+    /* ---- Inputs: cleaner, rounded, soft ---- */
+    .input-handle, textarea.input-handle, input.input-handle {
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+    }
+    .input-handle:focus { box-shadow: 0 0 0 4px rgba(59,130,246,0.14); border-color: var(--blue); }
+
+    /* ---- Platform / pills ---- */
+    .platform-pill { border-radius: 12px; background: #fff; box-shadow: var(--shadow-sm); border-color: var(--line); }
+    .platform-pill.active { background: var(--blue); border-color: var(--blue); box-shadow: 0 4px 12px rgba(59,130,246,0.28); }
+
+    /* ---- Tables ---- */
+    .table-container { border-radius: 14px; box-shadow: var(--shadow-sm); }
+    th { background: #FAFBFE; letter-spacing: 0.8px; }
+    tr:hover td { background: var(--blue-soft); }
+
+    /* ---- Chart containers ---- */
+    .chart-container {
+      border-radius: 16px;
+      background: linear-gradient(180deg, #FBFCFE, #F5F8FD);
+      border: 1px solid var(--line);
+    }
+    .chart-container h3 { font-family: var(--font-serif); }
+
+    /* ---- Library cards ---- */
+    .library-card { border-radius: 16px; box-shadow: var(--shadow-sm); }
+    .library-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+
+    /* ---- Terminal stays mono (intentional) ---- */
+    .dark-terminal { border-radius: 16px; }
+
+    /* Scrollbar polish */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(120,140,170,0.30); border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(120,140,170,0.50); background-clip: padding-box; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); background-clip: padding-box; }
   </style>
 </head>
 <body>
