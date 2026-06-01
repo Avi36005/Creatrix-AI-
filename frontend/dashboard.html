@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="config.js"></script>
+  <script src="orb.js" defer></script>
 
   <style>
     :root {
@@ -1431,37 +1432,13 @@
       </div>
       <div class="header-right" style="display:flex;align-items:center;gap:14px;">
         <div class="track-toggle">
-          <button class="track-btn t-active-intel" id="toggle-intel" onclick="setActiveTrack('intel')">Influencer Intelligence</button>
-          <button class="track-btn" id="toggle-creator" onclick="setActiveTrack('creator')">Viral Creator</button>
-          <button class="track-btn" id="toggle-full" onclick="setActiveTrack('full')">Full Platform</button>
+          <button class="track-btn t-active-intel" id="toggle-intel">Influencer Intelligence</button>
+          <button class="track-btn" id="toggle-creator">Viral Creator</button>
+          <button class="track-btn" id="toggle-full">Full Platform</button>
         </div>
         <span class="date-badge" id="current-date">June 1, 2026</span>
       </div>
     </header>
-
-    <!-- Top Stats Indicator Row -->
-    <div class="metrics-row">
-      <div class="metric-card">
-        <span class="metric-title">Creators Monitored</span>
-        <span class="metric-val">2,481</span>
-        <span class="metric-sub">↑ +14.2% this week</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-title">Avg. Ratefluencer Score</span>
-        <span class="metric-val" style="color: var(--blue);">84.5</span>
-        <span class="metric-sub" style="color: var(--blue);">High Campaign Ready</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-title">Primary Audience</span>
-        <span class="metric-val">Lifestyle</span>
-        <span class="metric-sub" style="color: var(--text-faint);">Niche Dominance</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-title">Scripts Generated</span>
-        <span class="metric-val">142</span>
-        <span class="metric-sub">Ready to publish</span>
-      </div>
-    </div>
 
     <!-- ========================================== -->
     <!-- PANEL 1: OVERVIEW TAB                      -->
@@ -1514,8 +1491,8 @@
               <div class="chart-container">
                 <h3>Growth Forecast</h3>
                 <svg class="chart-svg" viewBox="0 0 200 120">
-                  <path d="M 10 100 L 40 90 L 70 70 L 100 75 L 130 50 L 160 30" fill="none" stroke="#4F8EF7" stroke-width="2.5"/>
-                  <path d="M 160 30 L 190 15" fill="none" stroke="#4F8EF7" stroke-dasharray="3,3" stroke-width="2.5"/>
+                  <path id="ov-growth-line" d="M 10 100 L 40 90 L 70 70 L 100 75 L 130 50 L 160 30" fill="none" stroke="#4F8EF7" stroke-width="2.5"/>
+                  <path id="ov-growth-dash" d="M 160 30 L 190 15" fill="none" stroke="#4F8EF7" stroke-dasharray="3,3" stroke-width="2.5"/>
                   <circle cx="160" cy="30" r="3" fill="#4F8EF7"/>
                   <circle cx="190" cy="15" r="3" fill="#4F8EF7"/>
                   <line x1="10" y1="110" x2="190" y2="110" stroke="var(--border)" stroke-width="1"/>
@@ -1693,9 +1670,9 @@
             <div class="chart-container">
               <svg class="chart-svg" style="height: 200px;" viewBox="0 0 300 200">
                 <!-- Area path fill -->
-                <path d="M 20 180 L 70 150 L 120 120 L 170 135 L 220 90 L 270 45 L 270 180 Z" fill="rgba(79, 142, 247, 0.08)"/>
+                <path id="scorer-growth-area" d="M 20 180 L 70 150 L 120 120 L 170 135 L 220 90 L 270 45 L 270 180 Z" fill="rgba(79, 142, 247, 0.08)"/>
                 <!-- Line path -->
-                <path d="M 20 180 L 70 150 L 120 120 L 170 135 L 220 90 L 270 45" fill="none" stroke="#4F8EF7" stroke-width="3"/>
+                <path id="scorer-growth-line" d="M 20 180 L 70 150 L 120 120 L 170 135 L 220 90 L 270 45" fill="none" stroke="#4F8EF7" stroke-width="3"/>
                 <!-- Prediction dotted line -->
                 <path d="M 220 90 L 270 45" fill="none" stroke="#4F8EF7" stroke-dasharray="4,4" stroke-width="3"/>
                 <circle cx="220" cy="90" r="5" fill="#4F8EF7"/>
@@ -1800,12 +1777,12 @@
             <line x1="40" y1="210" x2="560" y2="210" stroke="var(--border)" stroke-width="1.5"/>
 
             <!-- Confidence Bounds Shaded Area -->
-            <path d="M 300 135 L 350 110 L 400 95 L 450 70 L 500 50 L 550 30 L 550 90 L 500 110 L 450 130 L 400 150 L 350 160 L 300 135 Z" fill="rgba(79, 142, 247, 0.08)"/>
+            <path id="pred-growth-area" d="M 300 135 L 350 110 L 400 95 L 450 70 L 500 50 L 550 30 L 550 90 L 500 110 L 450 130 L 400 150 L 350 160 L 300 135 Z" fill="rgba(79, 142, 247, 0.08)"/>
 
             <!-- Solid Historical Line -->
-            <path d="M 40 200 L 90 190 L 140 170 L 190 160 L 240 145 L 300 135" fill="none" stroke="#4F8EF7" stroke-width="3"/>
+            <path id="pred-growth-line" d="M 40 200 L 90 190 L 140 170 L 190 160 L 240 145 L 300 135" fill="none" stroke="#4F8EF7" stroke-width="3"/>
             <!-- Predicted Dash Line -->
-            <path d="M 300 135 L 350 130 L 400 118 L 450 95 L 500 80 L 550 60" fill="none" stroke="#4F8EF7" stroke-dasharray="4,4" stroke-width="3"/>
+            <path id="pred-growth-dash" d="M 300 135 L 350 130 L 400 118 L 450 95 L 500 80 L 550 60" fill="none" stroke="#4F8EF7" stroke-dasharray="4,4" stroke-width="3"/>
 
             <circle cx="300" cy="135" r="5" fill="#4F8EF7"/>
             <!-- Today Marker line -->
@@ -2781,6 +2758,56 @@
           setEl('auth-verdict-line',
             `${auth.authenticity_verdict || 'Analysis complete'} — pod risk: ${auth.engagement_pod_risk || 'low'}`);
         }
+
+        // ── Overview panel (same company, mirrored) ───────────────────────
+        const ovAvatar = document.getElementById('overview-avatar');
+        if (ovAvatar) {
+          const parts = String(niceHandle).replace('@', '').split(/[\._\-\s]/);
+          ovAvatar.textContent = parts.map(p => p[0] || '').join('').toUpperCase().slice(0, 2);
+        }
+        setEl('overview-handle-lbl', niceHandle);
+        setEl('overview-platform-lbl',
+          `${platform.charAt(0).toUpperCase() + platform.slice(1)} · ` +
+          `${(data.niche || 'general').charAt(0).toUpperCase() + (data.niche || 'general').slice(1)}`);
+        setEl('ov-score-ratefluencer', sc.ratefluencer_score || 0);
+        setEl('ov-score-authenticity', authPct);
+        setEl('ov-score-growth', growthPct);
+        setEl('ov-score-brand', brandPct);
+
+        // ── Redraw every growth graph from the REAL projection curve ──────
+        const curve = (growth.curve && growth.curve.length > 1) ? growth.curve : null;
+        if (curve) {
+          drawGrowthCurve('ov-growth-line', 'ov-growth-dash', null, curve, 10, 10, 180, 95);
+          drawGrowthCurve('scorer-growth-line', null, 'scorer-growth-area', curve, 20, 30, 250, 150);
+          drawGrowthCurve('pred-growth-line', 'pred-growth-dash', 'pred-growth-area', curve, 40, 30, 510, 170);
+        }
+      }
+
+      // Convert a numeric projection curve into SVG path data, scaled to the
+      // chart's plot box, and redraw the line (+ optional filled area).
+      function drawGrowthCurve(lineId, dashId, areaId, curve, x0, y0, w, h) {
+        const n = curve.length;
+        if (n < 2) return;
+        const min = Math.min(...curve), max = Math.max(...curve);
+        const range = (max - min) || 1;
+        const pts = curve.map((v, i) => {
+          const x = x0 + (i / (n - 1)) * w;
+          const y = y0 + h - ((v - min) / range) * h;
+          return `${x.toFixed(1)} ${y.toFixed(1)}`;
+        });
+        const lineD = 'M ' + pts.join(' L ');
+        const lineEl = document.getElementById(lineId);
+        if (lineEl) lineEl.setAttribute('d', lineD);
+        if (areaId) {
+          const areaEl = document.getElementById(areaId);
+          if (areaEl) areaEl.setAttribute('d',
+            `${lineD} L ${(x0 + w).toFixed(1)} ${(y0 + h).toFixed(1)} L ${x0.toFixed(1)} ${(y0 + h).toFixed(1)} Z`);
+        }
+        // The full curve already shows the projection — clear the stale dotted segment.
+        if (dashId) {
+          const dashEl = document.getElementById(dashId);
+          if (dashEl) dashEl.setAttribute('d', '');
+        }
       }
 
       // Re-render panels from stored company when navigating (no refetch needed).
@@ -3031,6 +3058,15 @@
 
       // --- TRACK TOGGLE --- now actually drives the platform: each button
       // switches to its starting page and runs that track's primary action.
+      // Bound via addEventListener (not inline onclick) because this whole
+      // script lives inside a DOMContentLoaded callback, so setActiveTrack is
+      // not global — inline onclick would fail to resolve it. Also kept on
+      // window as a convenience for any external caller.
+      window.setActiveTrack = setActiveTrack;
+      ['intel', 'creator', 'full'].forEach(track => {
+        const tb = document.getElementById({ intel: 'toggle-intel', creator: 'toggle-creator', full: 'toggle-full' }[track]);
+        if (tb) tb.addEventListener('click', () => setActiveTrack(track));
+      });
       function setActiveTrack(track) {
         const btns = { intel: 'toggle-intel', creator: 'toggle-creator', full: 'toggle-full' };
         const classes = { intel: 't-active-intel', creator: 't-active-creator', full: 't-active-full' };
@@ -3078,6 +3114,17 @@
         if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
         if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
         return String(n);
+      }
+
+      // Topic used when a generator's input is left empty — derives from the
+      // currently analyzed company so content stays on-theme.
+      function defaultTopic() {
+        const rec = (typeof CreatrixCompany !== 'undefined') ? CreatrixCompany.get() : null;
+        if (rec && rec.handle) {
+          const niche = (rec.data && rec.data.niche) ? rec.data.niche : 'creator';
+          return `${rec.handle} — ${niche} content for creators`;
+        }
+        return 'AI tools for content creators';
       }
 
       // ─── Platform pill selector helper ────────────────────────────────────
@@ -3328,8 +3375,8 @@
       if (btnGenerateLinkedIn) {
         btnGenerateLinkedIn.addEventListener('click', async () => {
           const topicEl = document.getElementById('linkedin-topic-input');
-          const topicValue = topicEl ? topicEl.value.trim() : '';
-          if (!topicValue) return;
+          const topicValue = (topicEl && topicEl.value.trim()) || defaultTopic();
+          if (topicEl && !topicEl.value.trim()) topicEl.value = topicValue;
 
           setLoading(btnGenerateLinkedIn, true);
           try {
@@ -3364,8 +3411,8 @@
       if (btnGenerateInstagram) {
         btnGenerateInstagram.addEventListener('click', async () => {
           const topicEl = document.getElementById('instagram-topic-input');
-          const topicValue = topicEl ? topicEl.value.trim() : '';
-          if (!topicValue) return;
+          const topicValue = (topicEl && topicEl.value.trim()) || defaultTopic();
+          if (topicEl && !topicEl.value.trim()) topicEl.value = topicValue;
 
           setLoading(btnGenerateInstagram, true);
           try {
@@ -3379,7 +3426,8 @@
 
             const capEl = document.getElementById('instagram-out-caption');
             if (capEl && data.caption) {
-              capEl.innerHTML = data.caption.replace(/\n/g, '<br>');
+              const tags = (data.hashtags || []).join(' ');
+              capEl.innerHTML = data.caption.replace(/\n/g, '<br>') + (tags ? `<br><br><span style="color:#0A66C2;">${tags}</span>` : '');
             }
           } catch (e) {
             const capEl = document.getElementById('instagram-out-caption');

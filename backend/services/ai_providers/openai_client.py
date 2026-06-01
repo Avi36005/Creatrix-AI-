@@ -1,26 +1,25 @@
 import sys
 import os
 import httpx
-import json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from core.config import settings
-from .openai_client import OpenAIChatClient
 
 
-class GroqClient:
-    BASE_URL = "https://api.groq.com/openai/v1"
+class OpenAIChatClient:
+    BASE_URL = "https://api.openai.com/v1"
+    MODEL = "gpt-4o-mini"
 
-    async def complete(self, system: str, user: str, max_tokens: int = 1000) -> str:
-        if not settings.GROQ_API_KEY or settings.GROQ_API_KEY.startswith("gsk_..."):
-            return await OpenAIChatClient().complete(system, user, max_tokens)
+    async def complete(self, system: str, user: str, max_tokens: int = 1500) -> str:
+        if not settings.OPENAI_API_KEY:
+            return ""
 
         headers = {
-            "Authorization": f"Bearer {settings.GROQ_API_KEY}",
+            "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
             "Content-Type": "application/json",
         }
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": self.MODEL,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
@@ -29,16 +28,17 @@ class GroqClient:
         }
 
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=60.0) as client:
                 r = await client.post(
                     f"{self.BASE_URL}/chat/completions",
                     headers=headers,
                     json=payload,
                 )
+                r.raise_for_status()
                 data = r.json()
                 return data["choices"][0]["message"]["content"]
         except Exception:
-            return await OpenAIChatClient().complete(system, user, max_tokens)
+            return ""
 
 
-groq_client = GroqClient()
+openai_chat_client = OpenAIChatClient()

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from services.ai_providers.gemini_client import GeminiClient
-from services.elevenlabs_service import generate_voiceover, AVAILABLE_VOICES
+from services.elevenlabs_service import generate_voiceover, list_elevenlabs_voices, AVAILABLE_VOICES
 
 router = APIRouter()
 gemini = GeminiClient()
@@ -87,4 +87,5 @@ async def generate_reel_voiceover(req: VoiceoverRequest):
 
 @router.get("/voices")
 async def list_voices():
-    return {"status": "success", "voices": AVAILABLE_VOICES}
+    # Live from the ElevenLabs account — no hardcoded presets.
+    return {"status": "success", "voices": await list_elevenlabs_voices()}

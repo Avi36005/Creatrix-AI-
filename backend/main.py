@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
-from api.routes import influencer, content, trends, agent, virality, reports
+from api.routes import influencer, content, trends, agent, virality, reports, chat
 
 app = FastAPI(
     title="Creatrix AI — Ratefluencer API",
@@ -28,6 +28,7 @@ app.include_router(trends.router,     prefix="/api/v1/trends",     tags=["Track0
 app.include_router(virality.router,   prefix="/api/v1/virality",   tags=["Track02 — Virality & Voiceover"])
 app.include_router(reports.router,    prefix="/api/v1/reports",    tags=["Reports & Library"])
 app.include_router(agent.router,      prefix="/api/v1/agent",      tags=["Grand Challenge — Autonomous Agent"])
+app.include_router(chat.router,       prefix="/api/v1/chat",       tags=["Help Chatbot"])
 
 
 @app.on_event("startup")

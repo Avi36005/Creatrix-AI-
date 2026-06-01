@@ -32,3 +32,4 @@ build/
 
 # Deploy artifacts
 deploy_log*.txt
+backend/_fulltest.py
