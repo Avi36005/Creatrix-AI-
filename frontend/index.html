@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creatrix AI — Built for creators. Powered by AI.</title>
+  <meta name="description" content="Creatrix AI is the unified AI platform for influencer intelligence and viral content creation. Built for creators. Powered by AI.">
+  
+  <!-- Creatrix AI Google Fonts pairing -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-transition">
+
+  <!-- Background Canvas for 3D Rotating Dotted Sphere & Glows -->
+  <div class="background-container">
+    <div class="radial-glow glow-bottom-left"></div>
+    <div class="radial-glow glow-bottom-right"></div>
+    <div class="radial-glow glow-center-wave"></div>
+    <div class="edge-light-left"></div>
+    <div class="edge-light-right"></div>
+    <canvas id="canvas-3d"></canvas>
+    <!-- Overlay Halftone Dot Pattern -->
+    <div class="halftone-overlay"></div>
+    <!-- Scanline glitch effect -->
+    <div class="scanlines"></div>
+    <!-- Noise/grain overlay -->
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Random Glitch Streaks -->
+  <div class="glitch-streaks-container" id="glitch-streaks"></div>
+
+  <!-- Loading State (Image 2) -->
+  <div class="loader-overlay" id="loader">
+    <div class="loader-content">
+      <div class="glitch-logo" data-text="CREATRIX">
+        <svg viewBox="0 0 100 100" class="logo-svg">
+          <circle cx="50" cy="50" r="16" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+          <circle cx="50" cy="28" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+          <circle cx="69" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+          <circle cx="69" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+          <circle cx="50" cy="72" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+          <circle cx="31" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+          <circle cx="31" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.2"/>
+        </svg>
+      </div>
+      <div class="loader-status">
+        <span class="status-label">Initializing Creatrix AI...</span>
+        <span class="status-percentage" id="load-progress">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Website Container -->
+  <div class="app-container" id="app">
+    
+    <!-- Hero Section Content -->
+    <section class="hero-section" id="hero">
+      <!-- Navigation Header -->
+      <header class="main-header">
+        <div class="logo">
+          <svg viewBox="0 0 100 100" class="logo-icon">
+            <circle cx="50" cy="50" r="16" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <circle cx="50" cy="28" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <circle cx="69" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <circle cx="69" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <circle cx="50" cy="72" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <circle cx="31" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <circle cx="31" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+          </svg>
+          <span class="logo-text">Creatrix AI</span>
+        </div>
+        <div class="header-tagline">Influencer Intelligence · Creator AI</div>
+        <button class="menu-btn" aria-label="Toggle Menu">
+          <span class="menu-line"></span>
+          <span class="menu-line"></span>
+        </button>
+      </header>
+
+      <!-- Center Hero Content -->
+      <div class="hero-content">
+        <h1 class="hero-title">
+          We predict <span class="serif-italic">influence</span><br>before it happens
+        </h1>
+        <p class="hero-subtitle">The AI platform for the creator economy</p>
+        <div class="hero-cta">
+          <button class="cta-button" id="cta-btn" onclick="window.location.href='dashboard.html'">
+            <span class="btn-text">Explore Platform</span>
+            <svg viewBox="0 0 24 24" class="arrow-icon">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scroll Down Indicator -->
+      <a href="#about" class="scroll-down-indicator" id="scroll-down-link">
+        <span class="scroll-text">Scroll down</span>
+        <svg viewBox="0 0 24 24" class="down-arrow-icon">
+          <path d="M12 5v14M19 12l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </a>
+    </section>
+
+    <!-- White Content Wrapper -->
+    <div class="white-sections-container">
+      
+      <!-- Light Detail/About Section (Image 4 & 5) -->
+      <section class="about-section" id="about">
+        <div class="about-container">
+
+
+          <!-- Right: Textual Information -->
+          <div class="about-text-content reveal reveal-delay-1">
+            <span class="about-meta-tag">About Creatrix AI</span>
+            <h2 class="about-heading">
+              Creatrix AI predicts <span class="serif-italic-dark">influence</span> and generates <span class="steel-blue-highlight">viral growth</span>
+            </h2>
+            <p class="about-body">
+              We combine deep machine learning with real-time trend intelligence to give brands and creators an unfair advantage. Discover high-potential creators before they blow up, generate viral content scripts, and predict campaign performance before you publish.
+            </p>
+            <div class="about-cta-wrapper">
+              <a href="dashboard.html" class="about-learn-more-link">
+                <span>Explore Dashboard</span>
+                <svg viewBox="0 0 24 24" class="inline-arrow">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tech Stack Marquee Section -->
+        <div class="marquee-wrapper reveal">
+          <div class="marquee-track" id="marquee-track">
+            <!-- Set 1 -->
+            <div class="marquee-logo"><span class="logoipsum-icon">●</span> CLAUDE API</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">▲</span> GROQ</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">■</span> OPENAI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">◆</span> ELEVENLABS</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">⬢</span> RUNWAY AI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">☼</span> LANGGRAPH</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">♾</span> CREWAI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">●</span> PINECONE</div>
+            <!-- Set 2 -->
+            <div class="marquee-logo"><span class="logoipsum-icon">●</span> CLAUDE API</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">▲</span> GROQ</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">■</span> OPENAI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">◆</span> ELEVENLABS</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">⬢</span> RUNWAY AI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">☼</span> LANGGRAPH</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">♾</span> CREWAI</div>
+            <div class="marquee-logo"><span class="logoipsum-icon">●</span> PINECONE</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Services List Section: Track 01 -->
+      <section class="services-section reveal" id="services">
+        <div class="section-container">
+          <div class="section-header" style="margin-bottom: 50px;">
+            <span class="about-meta-tag">Track 01</span>
+            <h2 class="about-heading">Influencer Intelligence Engine</h2>
+            <p style="color: var(--text-muted-light); font-size: 15px; margin-top: 8px;">Ensemble scoring, growth modeling, and authenticity audits</p>
+          </div>
+
+          <div class="services-layout">
+            <!-- Left Side: Interactive List -->
+            <div class="services-list-container reveal reveal-delay-1" id="track01-list">
+              <div class="service-item active" data-index="0">
+                <span class="service-number">01.</span>
+                <span class="service-title">Influencer Data Analyzer</span>
+              </div>
+              <div class="service-item" data-index="1">
+                <span class="service-number">02.</span>
+                <span class="service-title">Authenticity Detection Engine</span>
+              </div>
+              <div class="service-item" data-index="2">
+                <span class="service-number">03.</span>
+                <span class="service-title">Growth Prediction Model</span>
+              </div>
+              <div class="service-item" data-index="3">
+                <span class="service-number">04.</span>
+                <span class="service-title">AI Script Generator</span>
+              </div>
+              <div class="service-item" data-index="4">
+                <span class="service-number">05.</span>
+                <span class="service-title">Virality Prediction Engine</span>
+              </div>
+            </div>
+
+            <!-- Right Side: Crossfading Visual Panels -->
+            <div class="services-visual-container" style="background-color: var(--bg-card); display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 48px rgba(15, 23, 42, 0.15); height: 380px; width: 100%;">
+              <!-- Panel 0: Stats Grid -->
+              <div class="service-preview-panel active" id="service-preview-0">
+                <div class="mini-preview-card">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; margin-bottom: 12px; color: white;">Influencer Analyzer</h4>
+                  <div style="display: flex; gap: 20px; margin-bottom: 12px;">
+                    <div><span style="font-size: 10px; color: var(--text-muted-dark); text-transform: uppercase; display: block;">Followers</span><strong style="font-size: 16px; color: white;">2.4M</strong></div>
+                    <div><span style="font-size: 10px; color: var(--text-muted-dark); text-transform: uppercase; display: block;">Engagement</span><strong style="font-size: 16px; color: white;">6.8%</strong></div>
+                  </div>
+                  <div style="height: 5px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden;"><div style="width: 87%; height: 100%; background: var(--blue);"></div></div>
+                </div>
+              </div>
+              <!-- Panel 1: Authenticity Radar -->
+              <div class="service-preview-panel" id="service-preview-1">
+                <div class="mini-preview-card">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; margin-bottom: 12px; color: white;">Authenticity Audit</h4>
+                  <svg viewBox="0 0 100 100" style="width: 70px; height: 70px; margin: 10px auto; display: block;">
+                    <polygon points="50,10 85,30 85,70 50,90 15,70 15,30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+                    <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="rgba(61,214,140,0.15)" stroke="var(--green)" stroke-width="2"/>
+                  </svg>
+                  <div style="text-align: center; color: var(--green); font-size: 11px; font-weight: 600;">91/100 Safe</div>
+                </div>
+              </div>
+              <!-- Panel 2: Growth Line -->
+              <div class="service-preview-panel" id="service-preview-2">
+                <div class="mini-preview-card">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; margin-bottom: 12px; color: white;">Growth Forecast</h4>
+                  <svg viewBox="0 0 120 70" style="width: 100%; height: 60px; margin-top: 10px;">
+                    <path d="M10,60 Q30,45 60,35 T110,10" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+                    <circle cx="110" cy="10" r="3.5" fill="var(--blue)"/>
+                  </svg>
+                  <div style="text-align: center; color: var(--blue); font-size: 11px; font-weight: 600; margin-top: 4px;">↑ +340% Projected</div>
+                </div>
+              </div>
+              <!-- Panel 3: Script hook block -->
+              <div class="service-preview-panel" id="service-preview-3">
+                <div class="mini-preview-card" style="padding: 16px; width: 85%;">
+                  <span class="script-block-pill" style="background: #FFF3E0; color: var(--amber); margin-bottom: 8px; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block;">HOOK</span>
+                  <div class="script-block-text" style="font-size: 12px; line-height: 1.5; color: white; font-family: var(--font-mono);">"Stop scrolling — AI just changed the creator game forever..."</div>
+                </div>
+              </div>
+              <!-- Panel 4: Virality prediction -->
+              <div class="service-preview-panel" id="service-preview-4">
+                <div class="mini-preview-card">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; margin-bottom: 12px; color: white;">Virality Predictor</h4>
+                  <svg viewBox="0 0 100 60" style="width: 90px; height: 50px; margin: 5px auto; display: block;">
+                    <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="var(--blue)" stroke-width="8" stroke-linecap="round" stroke-dasharray="110" stroke-dashoffset="18"/>
+                  </svg>
+                  <div style="text-align: center; color: var(--blue); font-size: 11px; font-weight: 700; margin-top: 4px;">87/100 🔥</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Lavender Transition Band -->
+      <div class="lavender-transition-band">
+        <div class="floating-dots-container">
+          <div class="float-dot"></div><div class="float-dot"></div><div class="float-dot"></div>
+          <div class="float-dot"></div><div class="float-dot"></div><div class="float-dot"></div>
+          <div class="float-dot"></div><div class="float-dot"></div><div class="float-dot"></div>
+          <div class="float-dot"></div><div class="float-dot"></div><div class="float-dot"></div>
+          <div class="float-dot"></div><div class="float-dot"></div><div class="float-dot"></div>
+        </div>
+        <div class="scatter-container" id="scatter-text" style="font-size:clamp(14px,2vw,22px);letter-spacing:0.18em;gap:0.6em;flex-wrap:wrap;justify-content:center;max-width:900px;text-align:center;">
+          <span class="scatter-letter" style="font-size:1em;">CLAUDE</span>
+          <span class="scatter-letter" style="opacity:0.4;font-size:0.6em;">·</span>
+          <span class="scatter-letter" style="font-size:1em;">GROQ</span>
+          <span class="scatter-letter" style="opacity:0.4;font-size:0.6em;">·</span>
+          <span class="scatter-letter" style="font-size:1em;">LANGGRAPH</span>
+          <span class="scatter-letter" style="opacity:0.4;font-size:0.6em;">·</span>
+          <span class="scatter-letter" style="font-size:1em;">CREWAI</span>
+          <span class="scatter-letter" style="opacity:0.4;font-size:0.6em;">·</span>
+          <span class="scatter-letter" style="font-size:1em;">ELEVENLABS</span>
+          <span class="scatter-letter" style="opacity:0.4;font-size:0.6em;">·</span>
+          <span class="scatter-letter" style="font-size:1em;">PINECONE</span>
+        </div>
+      </div>
+
+      <!-- Track 02 Section: AI Reel Generation (Visual Left, List Right) -->
+      <section class="services-section reveal" id="track02" style="background-color: #f8fafc; border-top: 1px solid var(--border);">
+        <div class="section-container">
+          <div class="section-header" style="margin-bottom: 50px;">
+            <span class="about-meta-tag">Track 02</span>
+            <h2 class="about-heading">Viral Reel Creator Agent</h2>
+            <p style="color: var(--text-muted-light); font-size: 15px; margin-top: 8px;">Multi-agent orchestration writing, voicing, and generating high-converting video content</p>
+          </div>
+          
+          <div class="services-layout" style="grid-template-columns: 1fr 1.3fr;">
+            <!-- Left Side: Interactive Visual Panels -->
+            <div class="services-visual-container" style="background-color: var(--bg-card); display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 48px rgba(15, 23, 42, 0.15); height: 380px; width: 100%;">
+              <!-- Panel 0: Trend Feed -->
+              <div class="service-preview-panel active" id="t2-preview-0">
+                <div class="mini-preview-card" style="width: 80%;">
+                  <div style="font-size: 10px; color: var(--blue); font-weight: 600; text-transform: uppercase;">Trend Scraper</div>
+                  <div style="font-size: 14px; font-weight: 700; margin-top: 4px; color: white;">#1 AI in Creator Economy</div>
+                  <span class="badge badge-success" style="font-size: 10px; margin-top: 6px; display: inline-block;">↑ +340% velocity</span>
+                </div>
+              </div>
+              <!-- Panel 1: Trend Ranking -->
+              <div class="service-preview-panel" id="t2-preview-1">
+                <div class="mini-preview-card" style="width: 80%;">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; color: white;">ML Trend Ranker</h4>
+                  <div style="font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--blue); margin-top: 10px;">Score: 94</div>
+                </div>
+              </div>
+              <!-- Panel 2: Script Gen -->
+              <div class="service-preview-panel" id="t2-preview-2">
+                <div class="mini-preview-card" style="padding: 12px; width: 85%;">
+                  <span class="script-block-pill" style="background: #E8F0FE; color: var(--blue); margin-bottom: 4px; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block;">STORY</span>
+                  <div class="script-block-text" style="font-size: 11px; line-height: 1.4; color: white; font-family: var(--font-mono);">"Here's what nobody's telling you about influence..."</div>
+                </div>
+              </div>
+              <!-- Panel 3: ElevenLabs voice overlay -->
+              <div class="service-preview-panel" id="t2-preview-3">
+                <div class="mini-preview-card" style="width: 80%;">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; color: white; margin-bottom: 8px;">Voice Overlay</h4>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">🔊</span>
+                    <strong style="font-size: 13px; color: white;">Nova (Natural)</strong>
+                  </div>
+                </div>
+              </div>
+              <!-- Panel 4: LinkedIn Content -->
+              <div class="service-preview-panel" id="t2-preview-4">
+                <div class="mini-preview-card" style="width: 85%;">
+                  <span class="badge badge-info" style="font-size: 8px; margin-bottom: 4px; display: inline-block;">LinkedIn</span>
+                  <div style="font-size: 10px; line-height: 1.4; color: white;">"The creator economy is being rewritten by AI..."</div>
+                </div>
+              </div>
+              <!-- Panel 5: Instagram Caption -->
+              <div class="service-preview-panel" id="t2-preview-5">
+                <div class="mini-preview-card" style="width: 85%;">
+                  <span class="badge badge-warning" style="font-size: 8px; margin-bottom: 4px; display: inline-block;">Instagram</span>
+                  <div style="font-size: 10px; line-height: 1.4; color: white;">"The algorithm rewards authenticity 🤖✨..."</div>
+                </div>
+              </div>
+              <!-- Panel 6: Virality predict -->
+              <div class="service-preview-panel" id="t2-preview-6">
+                <div class="mini-preview-card" style="width: 80%;">
+                  <h4 style="font-family: var(--font-serif); font-size: 14px; color: white; margin-bottom: 6px;">Virality Score</h4>
+                  <div style="font-family: var(--font-mono); font-size: 32px; color: var(--green); font-weight: 700;">87/100</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Interactive List -->
+            <div class="services-list-container reveal reveal-delay-1" id="track02-list">
+              <div class="service-item t2-item active" data-t2-index="0">
+                <span class="service-number">01.</span>
+                <span class="service-title">Trend Discovery Engine</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="1">
+                <span class="service-number">02.</span>
+                <span class="service-title">ML Trend Ranking Model</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="2">
+                <span class="service-number">03.</span>
+                <span class="service-title">AI Script Generator</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="3">
+                <span class="service-number">04.</span>
+                <span class="service-title">Automated Reel Builder</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="4">
+                <span class="service-number">05.</span>
+                <span class="service-title">LinkedIn Content AI</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="5">
+                <span class="service-number">06.</span>
+                <span class="service-title">Instagram Caption AI</span>
+              </div>
+              <div class="service-item t2-item" data-t2-index="6">
+                <span class="service-number">07.</span>
+                <span class="service-title">Virality Prediction Engine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Capabilities Grid Section -->
+      <section class="capabilities-section reveal" id="capabilities">
+        <div class="section-container">
+          <div class="section-header centered-header">
+            <span class="about-meta-tag">Full Capabilities</span>
+            <h2 class="about-heading">Everything you need to dominate the creator economy</h2>
+            <p style="color: var(--text-muted-light); font-size: 15px; margin-top: 8px;">Two intelligent tracks. One unified platform.</p>
+          </div>
+          <div class="capabilities-grid capabilities-6-grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Card 1: dark — Track 01 -->
+            <div class="capability-card dark-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 01 · 01</span>
+                <h3>Ratefluencer Score™</h3>
+              </div>
+              <p>Ensemble ML model combining engagement quality, follower authenticity, and content consistency into a single 0–100 score.</p>
+              <div class="cap-visual-container" style="background: rgba(79,142,247,0.06); border-radius: 12px; display:flex; align-items:center; justify-content:center; height:100px;">
+                <span style="font-family:var(--font-mono); font-size:3rem; font-weight:800; color:var(--blue);">94</span>
+              </div>
+            </div>
+            <!-- Card 2: light — Track 02 -->
+            <div class="capability-card light-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 02 · 01</span>
+                <h3>Trend Discovery Engine</h3>
+              </div>
+              <p>Real-time scrapers capture micro-trends across Instagram, TikTok, YouTube and LinkedIn — scored by viral velocity.</p>
+              <div class="cap-visual-container" style="background: #f1f5f9; border-radius: 12px; display:flex; align-items:center; justify-content:center; height:100px; gap:8px;">
+                <span style="background:var(--blue);color:white;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;">↑ +340%</span>
+                <span style="font-size:12px;color:var(--text-muted-light);">velocity</span>
+              </div>
+            </div>
+            <!-- Card 3: light — Track 01 -->
+            <div class="capability-card light-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 01 · 02</span>
+                <h3>Authenticity Detection</h3>
+              </div>
+              <p>Bot detection, engagement pod analysis, and fake-follower estimation with 91%+ classification accuracy.</p>
+              <div class="cap-visual-container" style="background: #f0fdf4; border-radius: 12px; display:flex; align-items:center; justify-content:center; height:100px;">
+                <span style="font-size:13px; font-weight:600; color:#10b981;">✓ 91/100 Authentic</span>
+              </div>
+            </div>
+            <!-- Card 4: dark — Track 02 -->
+            <div class="capability-card dark-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 02 · 02</span>
+                <h3>AI Script Generator</h3>
+              </div>
+              <p>Claude-powered Hook → Story → Insight → CTA scripts optimised for 15s, 30s, 45s and 60s short-form video.</p>
+              <div class="cap-visual-container" style="background: rgba(245,166,35,0.08); border-radius: 12px; padding:12px; height:100px;">
+                <span style="background:#FFF3E0;color:var(--amber);font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-block;">HOOK</span>
+                <p style="font-size:11px;color:var(--text-muted-dark);margin-top:6px;font-family:var(--font-mono);line-height:1.4;">"Stop scrolling — AI just changed the creator game forever…"</p>
+              </div>
+            </div>
+            <!-- Card 5: dark — Track 01 -->
+            <div class="capability-card dark-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 01 · 03</span>
+                <h3>Growth Predictor</h3>
+              </div>
+              <p>Bayesian time-series forecasting projects follower growth across 3, 6, and 12-month horizons with 95% confidence bands.</p>
+              <div class="cap-visual-container" style="background:transparent; height:80px;">
+                <svg viewBox="0 0 200 60" style="width:100%;height:60px;">
+                  <path d="M10,55 Q60,40 100,28 T190,8" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+                  <path d="M10,55 Q60,40 100,28 T190,8 L190,60 L10,60Z" fill="rgba(79,142,247,0.08)"/>
+                  <circle cx="190" cy="8" r="4" fill="var(--blue)"/>
+                </svg>
+                <div style="text-align:center;color:var(--blue);font-size:11px;font-weight:600;">↑ +340% Projected Growth</div>
+              </div>
+            </div>
+            <!-- Card 6: light — Track 02 -->
+            <div class="capability-card light-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 02 · 03</span>
+                <h3>Reel Builder</h3>
+              </div>
+              <p>Automated video assembly using ElevenLabs voiceovers, Runway AI visuals, and ML-optimised captions — all in one pipeline.</p>
+              <div class="cap-visual-container" style="background:#f8fafc;border-radius:12px;display:flex;align-items:center;justify-content:center;height:100px;gap:12px;">
+                <span style="font-size:24px;">🎬</span>
+                <span style="font-size:12px;font-weight:600;color:var(--text-dark);">87/100 🔥 Virality</span>
+              </div>
+            </div>
+            <!-- Card 7: light — Track 01 -->
+            <div class="capability-card light-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 01 · 04</span>
+                <h3>Brand Matcher</h3>
+              </div>
+              <p>Semantic embedding alignment scores influencer-brand fit. Recommends top partnerships with AI-generated reasoning.</p>
+              <div class="cap-visual-container" style="background:#f1f5f9;border-radius:12px;padding:12px;height:100px;display:flex;flex-direction:column;gap:6px;justify-content:center;">
+                <div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--text-muted-light);">Nike</span><span style="color:var(--blue);font-weight:700;">96%</span></div>
+                <div style="height:3px;background:#e2e8f0;border-radius:100px;overflow:hidden;"><div style="width:96%;height:100%;background:var(--blue);"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:var(--text-muted-light);">Spotify</span><span style="color:var(--blue);font-weight:700;">94%</span></div>
+                <div style="height:3px;background:#e2e8f0;border-radius:100px;overflow:hidden;"><div style="width:94%;height:100%;background:var(--blue);"></div></div>
+              </div>
+            </div>
+            <!-- Card 8: dark — Track 02 -->
+            <div class="capability-card dark-card">
+              <div class="cap-header">
+                <span class="cap-number">Track 02 · 04</span>
+                <h3>Virality Predictor</h3>
+              </div>
+              <p>Pre-publish scoring engine evaluates hook strength, content novelty, and platform fit — predicting reach before you post.</p>
+              <div class="cap-visual-container" style="background:transparent; height:80px; display:flex; align-items:center; justify-content:center; gap:16px;">
+                <svg viewBox="0 0 100 60" style="width:80px;height:50px;">
+                  <path d="M15,50 A35,35 0 0 1 85,50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M15,50 A35,35 0 0 1 85,50" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="110" stroke-dashoffset="18"/>
+                </svg>
+                <span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--green);">87/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Demo Section -->
+      <section class="live-demo-section reveal" id="demo">
+        <div class="section-container">
+          <div class="section-header centered-header">
+            <span class="about-meta-tag">Live Demo</span>
+            <h2 class="about-heading">Try Creatrix AI Now</h2>
+            <p style="color:var(--text-muted-dark);font-size:15px;margin-top:8px;">Enter any creator handle and watch our AI analyse in real time</p>
+          </div>
+          <div class="demo-input-row">
+            <input type="text" class="demo-input" id="demo-handle-input" placeholder="@handle or creator name..."/>
+            <button class="demo-analyze-btn" id="demo-analyze-btn">
+              Analyse
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            </button>
+          </div>
+          <div class="demo-results-grid">
+            <!-- Card 1: Ratefluencer Score -->
+            <div class="demo-result-card">
+              <span class="demo-card-label">Ratefluencer Score™</span>
+              <div class="demo-card-value" id="demo-score">94</div>
+              <div class="demo-card-sub">Exceptional · Top 3% globally</div>
+              <div class="demo-card-bar-row">
+                <div>
+                  <div class="demo-mini-bar-label"><span>Authenticity</span><span>97%</span></div>
+                  <div class="demo-mini-bar-track"><div class="demo-mini-bar-fill" style="width:97%;background:var(--green);"></div></div>
+                </div>
+                <div>
+                  <div class="demo-mini-bar-label"><span>Engagement Quality</span><span>91%</span></div>
+                  <div class="demo-mini-bar-track"><div class="demo-mini-bar-fill" style="width:91%;background:var(--blue);"></div></div>
+                </div>
+                <div>
+                  <div class="demo-mini-bar-label"><span>Growth Velocity</span><span>88%</span></div>
+                  <div class="demo-mini-bar-track"><div class="demo-mini-bar-fill" style="width:88%;background:var(--purple);"></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- Card 2: Growth Forecast -->
+            <div class="demo-result-card">
+              <span class="demo-card-label">Growth Forecast</span>
+              <div class="demo-card-value">+340%</div>
+              <div class="demo-card-sub">Projected 12-month growth</div>
+              <svg viewBox="0 0 200 80" style="width:100%;height:80px;margin-top:auto;">
+                <path d="M10,70 Q60,55 100,40 T190,10" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+                <path d="M10,70 Q60,55 100,40 T190,10 L190,80 L10,80Z" fill="rgba(79,142,247,0.08)"/>
+                <line x1="130" y1="0" x2="130" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="3 3"/>
+                <text x="133" y="14" fill="rgba(255,255,255,0.35)" font-size="8" font-family="monospace">Today</text>
+                <circle cx="190" cy="10" r="4" fill="var(--blue)"/>
+              </svg>
+            </div>
+            <!-- Card 3: Viral Script Preview -->
+            <div class="demo-result-card">
+              <span class="demo-card-label">Script Preview</span>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;flex:1;">
+                <div style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:10px 12px;">
+                  <span style="font-size:8px;font-weight:700;color:var(--amber);text-transform:uppercase;display:block;margin-bottom:4px;">Hook · 0–5s</span>
+                  <p style="font-size:11px;color:var(--text-light);font-family:var(--font-mono);line-height:1.4;">"Stop scrolling — this AI just changed the creator game forever…"</p>
+                </div>
+                <div style="background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2);border-radius:10px;padding:10px 12px;">
+                  <span style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;display:block;margin-bottom:4px;">Story · 5–20s</span>
+                  <p style="font-size:11px;color:var(--text-light);font-family:var(--font-mono);line-height:1.4;">"Here's what nobody's telling you about influence…"</p>
+                </div>
+                <div style="background:rgba(61,214,140,0.08);border:1px solid rgba(61,214,140,0.2);border-radius:10px;padding:10px 12px;">
+                  <span style="font-size:8px;font-weight:700;color:var(--green);text-transform:uppercase;display:block;margin-bottom:4px;">CTA · 25–30s</span>
+                  <p style="font-size:11px;color:var(--text-light);font-family:var(--font-mono);line-height:1.4;">"Follow @creatrix.ai for the full AI creator playbook 👇"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Pipeline Section (How it works) -->
+      <section class="pipeline-section reveal" id="how-it-works">
+        <div class="section-container">
+          <div class="section-header centered-header">
+            <span class="about-meta-tag">How It Works</span>
+            <h2 class="about-heading">
+              Our Autonomous <span class="serif-italic-dark">Creatrix AI</span> Workflow
+            </h2>
+            <p style="color: var(--text-muted-light); font-size: 15px; margin-top: 8px;">
+              Three interconnected pipeline stages feeding our predictive models in real-time.
+            </p>
+          </div>
+
+          <div class="pipeline-flow-wrapper">
+            <!-- Stage 1 Card -->
+            <div class="pipeline-card">
+              <div>
+                <div class="pipeline-card-num">01</div>
+                <div class="pipeline-card-tag">STAGE 01 — SCOUT</div>
+                <h3 class="pipeline-card-title">Real-Time <span class="serif-italic-dark">Ingestion</span></h3>
+                <p class="pipeline-card-desc">
+                  High-performance scrapers capture micro-trends, follower data, and content streams across Instagram, YouTube, TikTok, and LinkedIn.
+                </p>
+              </div>
+              <div class="pipeline-metrics-box">
+                <div class="metric-row">
+                  <span class="metric-lbl">ACTIVE SCRAPERS</span>
+                  <span class="metric-val">1,420 /sec</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">SUCCESS RATE</span>
+                  <span class="metric-val green-text">99.94%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connector 1 -->
+            <div class="pipeline-connector">
+              <svg class="pipeline-svg" viewBox="0 0 100 60" fill="none" preserveAspectRatio="none">
+                <path d="M0,30 L100,30" class="pipeline-line-path" />
+                <path d="M0,30 L100,30" class="pipeline-line-active" />
+              </svg>
+            </div>
+
+            <!-- Stage 2 Card -->
+            <div class="pipeline-card">
+              <div>
+                <div class="pipeline-card-num">02</div>
+                <div class="pipeline-card-tag">STAGE 02 — SCORE</div>
+                <h3 class="pipeline-card-title">Predictive <span class="serif-italic-dark">Evaluation</span></h3>
+                <p class="pipeline-card-desc">
+                  Ensemble machine learning models analyze engagement authenticity, project growth curves, and compute the Ratefluencer Score™.
+                </p>
+              </div>
+              <div class="pipeline-metrics-box">
+                <div class="metric-row">
+                  <span class="metric-lbl">MODEL LATENCY</span>
+                  <span class="metric-val">4.2ms /query</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">FORECAST BOUNDS</span>
+                  <span class="metric-val blue-text">95% Conf</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connector 2 -->
+            <div class="pipeline-connector">
+              <svg class="pipeline-svg" viewBox="0 0 100 60" fill="none" preserveAspectRatio="none">
+                <path d="M0,30 L100,30" class="pipeline-line-path" />
+                <path d="M0,30 L100,30" class="pipeline-line-active" />
+              </svg>
+            </div>
+
+            <!-- Stage 3 Card -->
+            <div class="pipeline-card">
+              <div>
+                <div class="pipeline-card-num">03</div>
+                <div class="pipeline-card-tag">STAGE 03 — RENDER</div>
+                <h3 class="pipeline-card-title">Script <span class="serif-italic-dark">Synthesis</span></h3>
+                <p class="pipeline-card-desc">
+                  Autonomous agents construct hook-heavy script outlines, generate captions, synthesize audio voiceovers, and rank virality before publishing.
+                </p>
+              </div>
+              <div class="pipeline-metrics-box">
+                <div class="metric-row">
+                  <span class="metric-lbl">VOICEOVER SPEED</span>
+                  <span class="metric-val">120 chars/s</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-lbl">VIRAL ACCURACY</span>
+                  <span class="metric-val green-text">94.8% rating</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Virality Before/After Comparison -->
+      <section class="virality-comparison-section reveal" id="compare">
+        <div class="section-container">
+          <div class="section-header centered-header">
+            <span class="about-meta-tag">The Creatrix AI Difference</span>
+            <h2 class="about-heading" style="color:var(--text-light);">What changes when you use AI</h2>
+            <p style="color:var(--text-muted-dark);font-size:15px;margin-top:8px;">The same content. A completely different outcome.</p>
+          </div>
+          <div class="comparison-grid">
+            <div class="comparison-card without">
+              <span class="comp-label">Without Creatrix AI</span>
+              <div class="comp-score">34<span>/100</span></div>
+              <div class="comp-desc">Guessing content strategy, no data-driven insights, average engagement, missed trends.</div>
+            </div>
+            <div class="comparison-card optimizing">
+              <span class="comp-label">Optimising</span>
+              <div class="comp-arrow">→</div>
+              <div class="comp-desc" style="color:var(--text-muted-dark);">AI analyses trends, generates scripts, and predicts performance before you publish.</div>
+            </div>
+            <div class="comparison-card with">
+              <span class="comp-label">With Creatrix AI</span>
+              <div class="comp-score">87<span>/100</span></div>
+              <div class="comp-desc" style="color:var(--text-muted-light);">Data-driven content strategy, viral predictions, peak engagement, and brand-matched partnerships.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Dark Call-To-Action & Footer Section (NEW!) -->
+    <footer class="footer-section">
+      <div class="footer-cta-container">
+          <h2 class="footer-cta-title">
+            Ready to turn your influence into a competitive advantage?
+          </h2>
+          <button class="cta-button footer-cta-btn" onclick="window.location.href='dashboard.html'">Explore Platform</button>
+      </div>
+
+      <div class="footer-bottom-grid">
+        <!-- Logo Column -->
+        <div class="footer-info-col">
+          <div class="logo">
+            <svg viewBox="0 0 100 100" class="logo-icon">
+              <circle cx="50" cy="50" r="16" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="50" cy="28" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+              <circle cx="69" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+              <circle cx="69" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+              <circle cx="50" cy="72" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+              <circle cx="31" cy="61" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+              <circle cx="31" cy="39" r="12" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            </svg>
+            <span class="logo-text">Creatrix AI</span>
+          </div>
+          <p class="copyright-label">© 2026 Creatrix AI. All rights reserved.</p>
+
+        </div>
+
+        <!-- Links Column 1 -->
+        <div class="footer-links-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">Labs</a></li>
+            <li><a href="#">Case Studies</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Column 2 -->
+        <div class="footer-links-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Column -->
+        <div class="footer-links-col">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><a href="mailto:contact@creatrix.ai" class="email-link">contact@creatrix.ai</a></li>
+            <li><span class="address-label">London, United Kingdom</span></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
