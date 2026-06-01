@@ -1177,9 +1177,20 @@
       --shadow-sm: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
       --shadow-md: 0 4px 12px rgba(16,24,40,0.06), 0 12px 28px rgba(16,24,40,0.05);
       --shadow-lg: 0 8px 24px rgba(16,24,40,0.08), 0 24px 48px rgba(16,24,40,0.07);
+      /* DM Sans everywhere — retire Syne in the dashboard for a clean, consistent look */
+      --font-serif: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Unify fonts — DM Sans everywhere, Syne only for major headings */
+    /* Force DM Sans on every heading, brand mark and chart title */
+    h1, h2, h3, h4, h5,
+    .header-left h1, .panel-header h2, .white-card h2,
+    .brand-name, .chart-container h3, .metric-val {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.025em !important;
+    }
+
+    /* Unify fonts — DM Sans everywhere */
     body { font-family: var(--font-sans); letter-spacing: -0.01em;
       background:
         radial-gradient(900px 500px at 100% -5%, rgba(59,130,246,0.05), transparent 60%),
