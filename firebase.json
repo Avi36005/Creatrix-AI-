@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "creatrixai",
     "public": "frontend",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
