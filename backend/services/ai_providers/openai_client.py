@@ -40,5 +40,46 @@ class OpenAIChatClient:
         except Exception:
             return ""
 
+    async def generate_image(self, prompt: str, size: str = "1024x1024") -> str:
+        """
+        Generate an image with OpenAI and return it as base64 PNG (no data URI
+        prefix), or '' on failure. Tries gpt-image-1 first (newest), then falls
+        back to dall-e-3 — so it works whether or not the account is verified
+        for gpt-image-1.
+        """
+        if not settings.OPENAI_API_KEY:
+            return ""
+
+        headers = {
+            "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        }
+        attempts = [
+            {"model": "gpt-image-1", "prompt": prompt[:1000], "size": size, "n": 1},
+            {"model": "dall-e-3", "prompt": prompt[:1000], "size": "1024x1024",
+             "n": 1, "response_format": "b64_json"},
+        ]
+
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                for payload in attempts:
+                    try:
+                        r = await client.post(
+                            f"{self.BASE_URL}/images/generations",
+                            headers=headers,
+                            json=payload,
+                        )
+                        if r.status_code != 200:
+                            continue
+                        item = (r.json().get("data") or [{}])[0]
+                        b64 = item.get("b64_json")
+                        if b64:
+                            return b64
+                    except Exception:
+                        continue
+        except Exception:
+            return ""
+        return ""
+
 
 openai_chat_client = OpenAIChatClient()

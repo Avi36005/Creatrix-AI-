@@ -64,7 +64,12 @@
   #cx-input{flex:1;background:#1c2030;border:1px solid #2a2f3a;border-radius:10px;color:#e6e8ee;padding:9px 12px;
     font-size:13px;outline:none;}
   #cx-send{background:#6d5cfc;border:none;color:#fff;border-radius:10px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;}
-  #cx-send:disabled{opacity:.5;cursor:default;}`;
+  #cx-send:disabled{opacity:.5;cursor:default;}
+  .cx-speak{margin-left:6px;background:transparent;border:none;color:#9aa0b2;cursor:pointer;font-size:12px;padding:0;opacity:.7;vertical-align:baseline;}
+  .cx-speak:hover{opacity:1;}
+  #cx-mic{background:#1c2030;border:1px solid #2a2f3a;color:#e6e8ee;border-radius:10px;padding:0 12px;cursor:pointer;font-size:15px;flex-shrink:0;}
+  #cx-mic.recording{background:#e0245e;border-color:#e0245e;color:#fff;animation:cxspeak .8s ease-in-out infinite;}
+  #cx-mic:disabled{opacity:.4;cursor:default;}`;
   const styleEl = document.createElement("style");
   styleEl.textContent = css;
   document.head.appendChild(styleEl);
@@ -92,7 +97,8 @@
     </div>
     <div id="cx-msgs"></div>
     <div id="cx-input-row">
-      <input id="cx-input" type="text" placeholder="Type your question…" autocomplete="off"/>
+      <button id="cx-mic" title="Speak your question">🎤</button>
+      <input id="cx-input" type="text" placeholder="Type or speak your question…" autocomplete="off"/>
       <button id="cx-send">Send</button>
     </div>`;
   document.body.appendChild(panel);
@@ -101,11 +107,25 @@
   const input = panel.querySelector("#cx-input");
   const sendBtn = panel.querySelector("#cx-send");
   const voiceBtn = panel.querySelector("#cx-voice");
+  const micBtn = panel.querySelector("#cx-mic");
 
   function addMsg(text, who) {
     const d = document.createElement("div");
     d.className = "cx-msg " + (who === "user" ? "cx-user" : "cx-bot");
-    d.textContent = text;
+    if (who === "user") {
+      d.textContent = text;
+    } else {
+      // Bot bubble: text + a per-message 🔊 button that plays THIS reply.
+      const span = document.createElement("span");
+      span.textContent = text;
+      d.appendChild(span);
+      const b = document.createElement("button");
+      b.className = "cx-speak";
+      b.title = "Play this reply aloud";
+      b.textContent = "🔊";
+      b.addEventListener("click", (e) => { e.stopPropagation(); speakText(text); });
+      d.appendChild(b);
+    }
     msgs.appendChild(d);
     msgs.scrollTop = msgs.scrollHeight;
     return d;
@@ -136,45 +156,105 @@
     speak();
   });
 
-  // Kick off ElevenLabs synthesis as soon as a reply lands so the MP3 is ready
-  // before the user ever clicks 🔊. Returns a Promise that resolves to a blob URL.
-  function prepareVoice(text) {
-    voiceUrl = null;
-    voicePrep = (async () => {
-      if (!text) return null;
-      try {
-        const body = { script_text: text.slice(0, 500) };
-        if (voiceId) body.voice_id = voiceId;   // live voice; else backend default
-        const r = await fetch(`${API}/api/v1/virality/voiceover`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!r.ok) return null;
-        const d = await r.json();
-        if (!d.audio_base64) return null;
-        const bytes = Uint8Array.from(atob(d.audio_base64), (c) => c.charCodeAt(0));
-        voiceUrl = URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" }));
-        return voiceUrl;
-      } catch (_) {
-        return null;
-      }
-    })();
-    return voicePrep;
+  // Synthesize speech for arbitrary text via ElevenLabs; resolves to a blob
+  // URL (or null). Shared by the header button, per-message buttons, and the
+  // pre-generation path.
+  async function synthesize(text) {
+    if (!text) return null;
+    try {
+      const body = { script_text: text.slice(0, 500) };
+      if (voiceId) body.voice_id = voiceId;   // live voice; else backend default
+      const r = await fetch(`${API}/api/v1/virality/voiceover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) return null;
+      const d = await r.json();
+      if (!d.audio_base64) return null;
+      const bytes = Uint8Array.from(atob(d.audio_base64), (c) => c.charCodeAt(0));
+      return URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" }));
+    } catch (_) {
+      return null;
+    }
   }
 
-  async function speak() {
-    // Use the pre-generated clip if ready; otherwise await the in-flight job;
-    // as a last resort, synthesize now for whatever the last reply was.
-    let url = voiceUrl;
-    if (!url && voicePrep) url = await voicePrep;
-    if (!url && lastReply) url = await prepareVoice(lastReply);
+  function playFromUrl(url) {
     if (!url) return;
     if (currentAudio) currentAudio.pause();
     currentAudio = new Audio(url);
     orb.classList.add("speaking");
     currentAudio.onended = () => orb.classList.remove("speaking");
     currentAudio.play().catch(() => orb.classList.remove("speaking"));
+  }
+
+  // Kick off synthesis the moment a reply lands so the header 🔊 plays instantly.
+  function prepareVoice(text) {
+    voiceUrl = null;
+    voicePrep = synthesize(text).then((url) => { voiceUrl = url; return url; });
+    return voicePrep;
+  }
+
+  // Header 🔊 — plays the latest reply using the pre-generated clip when ready.
+  async function speak() {
+    let url = voiceUrl;
+    if (!url && voicePrep) url = await voicePrep;
+    if (!url && lastReply) url = await synthesize(lastReply);
+    playFromUrl(url);
+  }
+
+  // Per-message 🔊 — plays a specific reply. Toggles off if already playing,
+  // reuses the pre-generated clip when it's the latest reply.
+  async function speakText(text) {
+    if (currentAudio && !currentAudio.paused) {
+      currentAudio.pause();
+      orb.classList.remove("speaking");
+      return;
+    }
+    let url = (text === lastReply && voiceUrl) ? voiceUrl : null;
+    if (!url && text === lastReply && voicePrep) url = await voicePrep;
+    if (!url) url = await synthesize(text);
+    playFromUrl(url);
+  }
+
+  // ── Speech-to-text (mic) ──────────────────────────────────────────────
+  // Uses the browser's built-in SpeechRecognition (Chrome/Edge). Click 🎤,
+  // speak, and the transcript fills the input and auto-sends.
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recog = null, recording = false;
+  if (!SR) {
+    micBtn.disabled = true;
+    micBtn.title = "Speech-to-text needs Chrome or Edge";
+  } else {
+    recog = new SR();
+    recog.lang = "en-US";
+    recog.interimResults = true;
+    recog.continuous = false;
+    let finalText = "";
+    recog.onresult = (e) => {
+      let interim = "";
+      finalText = "";
+      for (let i = 0; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      input.value = (finalText || interim).trim();
+    };
+    recog.onerror = () => stopRec();
+    recog.onend = () => {
+      stopRec();
+      if (input.value.trim()) send();   // auto-send the spoken question
+    };
+    micBtn.addEventListener("click", () => {
+      if (recording) { recog.stop(); return; }
+      try { input.value = ""; recog.start(); recording = true; micBtn.classList.add("recording"); micBtn.textContent = "⏹"; }
+      catch (_) { stopRec(); }
+    });
+  }
+  function stopRec() {
+    recording = false;
+    micBtn.classList.remove("recording");
+    micBtn.textContent = "🎤";
   }
 
   async function send() {

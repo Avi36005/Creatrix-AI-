@@ -1454,6 +1454,7 @@
           <div class="search-row">
             <input type="text" class="input-handle" id="overview-handle-input" value="MrBeast" placeholder="Enter a channel / handle (e.g. MrBeast)">
             <button class="btn-action" id="btn-overview-analyze">Analyze</button>
+            <button class="btn-action" id="btn-overview-speak" title="Hear the analysis read aloud" style="background: transparent; border: 1px solid var(--border); color: var(--text-dark);">🔊 Speak</button>
           </div>
 
           <!-- Analysis Results block -->
@@ -2335,7 +2336,7 @@
         </div>
 
         <div class="white-card" style="padding: 24px;">
-          <div style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); border-radius: 12px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-bottom: 16px;">
+          <div id="instagram-image-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); border-radius: 12px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-bottom: 16px; background-size: cover; background-position: center; text-align: center; font-size: 13px; overflow: hidden;">
             IMAGE PREVIEW
           </div>
           <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">@creatrix.ai</div>
@@ -3414,9 +3415,30 @@
           const topicValue = (topicEl && topicEl.value.trim()) || defaultTopic();
           if (topicEl && !topicEl.value.trim()) topicEl.value = topicValue;
 
+          const apiBase = window.API_BASE || 'http://localhost:8080';
+          const imgEl = document.getElementById('instagram-image-preview');
           setLoading(btnGenerateInstagram, true);
+
+          // Kick off the AI image generation in parallel with the caption.
+          if (imgEl) {
+            imgEl.style.backgroundImage = '';
+            imgEl.textContent = 'Generating image…';
+          }
+          const imagePromise = fetch(`${apiBase}/api/v1/content/instagram-image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic: topicValue })
+          }).then(r => r.ok ? r.json() : null).then(d => {
+            if (imgEl && d && d.image_base64) {
+              imgEl.textContent = '';
+              imgEl.style.backgroundImage = `url(data:image/png;base64,${d.image_base64})`;
+            } else if (imgEl) {
+              imgEl.textContent = 'Image unavailable';
+            }
+          }).catch(() => { if (imgEl) imgEl.textContent = 'Image unavailable'; });
+
           try {
-            const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/content/instagram`, {
+            const response = await fetch(`${apiBase}/api/v1/content/instagram`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ topic: topicValue, style: 'engaging' })
@@ -3433,7 +3455,67 @@
             const capEl = document.getElementById('instagram-out-caption');
             if (capEl) capEl.textContent = 'API offline — configure backend for AI captions.';
           } finally {
+            await imagePromise;   // keep the button busy until the image resolves too
             setLoading(btnGenerateInstagram, false);
+          }
+        });
+      }
+
+      // ─── Overview: speak the analysis aloud (ElevenLabs, on click only) ───
+      const btnOverviewSpeak = document.getElementById('btn-overview-speak');
+      let overviewAudio = null;
+      if (btnOverviewSpeak) {
+        btnOverviewSpeak.addEventListener('click', async () => {
+          // Toggle off if it's already speaking.
+          if (overviewAudio && !overviewAudio.paused) {
+            overviewAudio.pause();
+            btnOverviewSpeak.textContent = '🔊 Speak';
+            return;
+          }
+          const rec = (typeof CreatrixCompany !== 'undefined') ? CreatrixCompany.get() : null;
+          const d = (rec && rec.data) ? rec.data : null;
+          if (!d) {
+            btnOverviewSpeak.textContent = 'Analyze first';
+            setTimeout(() => { btnOverviewSpeak.textContent = '🔊 Speak'; }, 1500);
+            return;
+          }
+          // Build a spoken summary from the REAL analysis data.
+          const s = d.scores || {}, m = d.metrics || {};
+          const handle = d.handle || (rec && rec.handle) || 'this creator';
+          let text = `Analysis for ${handle}. `;
+          if (m.followers) text += `${formatNumber(m.followers)} followers. `;
+          if (s.ratefluencer_score != null) text += `Ratefluencer score ${s.ratefluencer_score} out of 100. `;
+          if (s.authenticity_score != null) text += `Authenticity ${s.authenticity_score}. `;
+          if (s.growth_score != null) text += `Growth potential ${s.growth_score}. `;
+          if (s.brand_score != null) text += `Brand match ${s.brand_score}. `;
+          if (d.summary) text += d.summary;
+
+          btnOverviewSpeak.textContent = 'Generating…';
+          btnOverviewSpeak.disabled = true;
+          try {
+            const r = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/virality/voiceover`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ script_text: text.slice(0, 500) })
+            });
+            const data = r.ok ? await r.json() : null;
+            if (data && data.audio_base64) {
+              const bytes = Uint8Array.from(atob(data.audio_base64), c => c.charCodeAt(0));
+              const url = URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' }));
+              if (overviewAudio) overviewAudio.pause();
+              overviewAudio = new Audio(url);
+              btnOverviewSpeak.textContent = '⏸ Stop';
+              overviewAudio.onended = () => { btnOverviewSpeak.textContent = '🔊 Speak'; };
+              overviewAudio.play().catch(() => { btnOverviewSpeak.textContent = '🔊 Speak'; });
+            } else {
+              btnOverviewSpeak.textContent = 'Voice unavailable';
+              setTimeout(() => { btnOverviewSpeak.textContent = '🔊 Speak'; }, 1500);
+            }
+          } catch (e) {
+            btnOverviewSpeak.textContent = 'Voice unavailable';
+            setTimeout(() => { btnOverviewSpeak.textContent = '🔊 Speak'; }, 1500);
+          } finally {
+            btnOverviewSpeak.disabled = false;
           }
         });
       }
