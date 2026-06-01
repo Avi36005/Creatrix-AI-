@@ -2,6 +2,10 @@
 # Run: ./deploy.ps1
 # Requires: gcloud CLI, firebase CLI, both logged in
 
+# Always run from the repo root so `--source=.` and relative file reads resolve
+# correctly regardless of the caller's working directory.
+Set-Location $PSScriptRoot
+
 $PROJECT = "mediflow-nexus-2026"
 $REGION  = "us-central1"
 $SERVICE = "creatrix-ai-backend"
@@ -23,7 +27,9 @@ Get-Content $envFile | Where-Object { $_ -match "^\s*[^#].+=.+" } | ForEach-Obje
 
 # Always set these
 $envVars["APP_ENV"] = "production"
-$envVars["PORT"]    = "8080"
+
+# PORT is a Cloud Run reserved env var (auto-set by the platform) — never pass it.
+$envVars.Remove("PORT") | Out-Null
 
 # Build --set-env-vars string (never echoed to screen)
 $envStr = ($envVars.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ","
@@ -42,6 +48,7 @@ $deployArgs = @(
     "--cpu=1",
     "--min-instances=0",
     "--max-instances=3",
+    "--clear-base-image",
     "--set-env-vars=$envStr"
 )
 

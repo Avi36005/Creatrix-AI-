@@ -5,6 +5,7 @@ import hashlib
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from services.ai_providers.gemini_client import GeminiClient
+from services.scraper_service import get_live_trends
 
 _DATA_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -57,21 +58,33 @@ class TrendService:
         self.gemini = GeminiClient()
 
     async def discover_trends(self, category: str = "all", limit: int = 10) -> list:
-        raw = _load_sample_trends()
+        # 1) Try LIVE trends (Reddit + Google News, keyless; YouTube + NewsAPI
+        #    when keys present). Fall back to curated static data if nothing.
+        live = []
+        try:
+            live = await get_live_trends(category, limit)
+        except Exception:
+            live = []
 
-        if category.lower() != "all":
+        self.is_live = bool(live)
+        raw = live if live else _load_sample_trends()
+
+        if not live and category.lower() != "all":
             filtered = [t for t in raw if t.get("category", "").lower() == category.lower()]
-            if not filtered:
-                filtered = raw
-        else:
-            filtered = raw
+            raw = filtered if filtered else raw
 
-        filtered = filtered[:limit]
+        filtered = raw[:limit]
 
         enriched = []
         for i, trend in enumerate(filtered):
             cat_key = trend.get("category", "general").lower()
             trend_title = trend.get("trend") or trend.get("title", "")
+
+            # Live items carry growth_pct (int); static carry growth_velocity (str).
+            if "growth_velocity" in trend:
+                growth_velocity = trend["growth_velocity"]
+            else:
+                growth_velocity = f"+{trend.get('growth_pct', 100)}%"
 
             viral_angle = _VIRAL_ANGLES.get(cat_key, _VIRAL_ANGLES["general"])
             script_hook = _HOOKS.get(cat_key, _HOOKS["general"])
@@ -82,11 +95,13 @@ class TrendService:
                 "title": trend_title,
                 "category": trend.get("category", "General"),
                 "score": trend.get("score", 75),
-                "growth_velocity": trend.get("growth_velocity", "+100%"),
-                "sources": trend.get("sources", ["LinkedIn"]),
+                "growth_velocity": growth_velocity,
+                "sources": trend.get("sources", ["Web"]),
+                "url": trend.get("url", ""),
                 "viral_angle": viral_angle,
                 "script_hook": script_hook,
                 "content_idea": content_idea,
+                "is_live": bool(live),
             }
             enriched.append(enriched_trend)
 

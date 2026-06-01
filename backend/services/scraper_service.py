@@ -26,8 +26,8 @@ _STATIC_TRENDS = [
 ]
 
 async def fetch_reddit_trends(category: str = "all", limit: int = 5) -> list:
-    if not settings.REDDIT_CLIENT_ID or not settings.REDDIT_CLIENT_SECRET:
-        return []
+    # Reddit's public .json listings work WITHOUT API keys as long as we send a
+    # descriptive User-Agent. No client_id/secret required.
     subreddits = {
         "AI": "artificial+MachineLearning",
         "Marketing": "marketing+socialmedia",
@@ -37,11 +37,15 @@ async def fetch_reddit_trends(category: str = "all", limit: int = 5) -> list:
         "Creator Economy": "NewTubers+content_marketing",
     }
     sub = subreddits.get(category, "technology+marketing+artificial")
-    url = f"https://www.reddit.com/r/{sub}/hot.json?limit={limit}"
-    headers = {"User-Agent": "CreatrixAI/1.0"}
+    url = f"https://www.reddit.com/r/{sub}/hot.json?limit={limit}&raw_json=1"
+    headers = {
+        "User-Agent": "python:creatrix-ai-trends:v2.0 (by /u/creatrixai)",
+        "Accept": "application/json",
+    }
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
             r = await client.get(url, headers=headers)
+            r.raise_for_status()
             posts = r.json()["data"]["children"]
             results = []
             for p in posts[:limit]:
@@ -98,32 +102,104 @@ async def fetch_newsapi_trends(category: str = "all", limit: int = 5) -> list:
     except Exception:
         return []
 
-async def fetch_youtube_trends(limit: int = 5) -> list:
+async def fetch_google_news_trends(category: str = "all", limit: int = 5) -> list:
+    """Keyless news trends via the public Google News RSS feed (no API key)."""
+    import re
+    from urllib.parse import quote_plus
+    from xml.etree import ElementTree as ET
+
+    queries = {
+        "AI": "artificial intelligence content creator",
+        "Marketing": "influencer marketing 2026",
+        "Business": "creator economy startup",
+        "Finance": "creator economy funding",
+        "Startups": "startup founder personal brand",
+        "Creator Economy": "content creator monetization",
+        "Social": "social media algorithm 2026",
+    }
+    q = queries.get(category, "influencer marketing AI content creator")
+    url = (
+        "https://news.google.com/rss/search"
+        f"?q={quote_plus(q)}&hl=en-US&gl=US&ceid=US:en"
+    )
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; CreatrixAI/2.0)"}
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers=headers)
+            r.raise_for_status()
+            root = ET.fromstring(r.text)
+            items = root.findall(".//item")
+            results = []
+            for it in items[:limit]:
+                title = (it.findtext("title") or "").strip()
+                link = (it.findtext("link") or "").strip()
+                if not title:
+                    continue
+                # Google News titles end with " - Source"; trim the source tag.
+                clean = re.sub(r"\s+-\s+[^-]+$", "", title)[:100]
+                seed = int(hashlib.md5(title.encode()).hexdigest(), 16)
+                results.append({
+                    "title": clean,
+                    "category": category if category != "all" else "News",
+                    "score": 62 + (seed % 33),
+                    "growth_pct": 55 + (seed % 140),
+                    "sources": ["Google News"],
+                    "url": link,
+                })
+            return results
+    except Exception:
+        return []
+
+
+async def fetch_youtube_trends(category: str = "all", limit: int = 5) -> list:
+    """On-theme YouTube trends: search creator/marketing keywords (not generic
+    most-popular), then rank by real view counts."""
     if not settings.YOUTUBE_API_KEY:
         return []
-    url = "https://www.googleapis.com/youtube/v3/videos"
-    params = {
-        "part": "snippet,statistics",
-        "chart": "mostPopular",
-        "videoCategoryId": "22",
-        "maxResults": limit,
-        "key": settings.YOUTUBE_API_KEY,
+    key = settings.YOUTUBE_API_KEY
+    queries = {
+        "AI": "AI content creation tools",
+        "Marketing": "influencer marketing strategy 2026",
+        "Business": "creator economy business",
+        "Finance": "creator monetization income",
+        "Startups": "personal branding founder",
+        "Creator Economy": "grow social media audience",
+        "Social": "social media algorithm tips",
     }
+    q = queries.get(category, "creator economy influencer marketing")
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            r = await client.get(url, params=params)
-            items = r.json().get("items", [])
+            # 1) Search relevant videos from the past 3 months, by view count.
+            from datetime import datetime, timedelta, timezone
+            after = (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            s = await client.get(
+                "https://www.googleapis.com/youtube/v3/search",
+                params={
+                    "part": "snippet", "q": q, "type": "video",
+                    "order": "viewCount", "publishedAfter": after,
+                    "relevanceLanguage": "en", "maxResults": limit, "key": key,
+                },
+            )
+            s.raise_for_status()
+            ids = [it["id"]["videoId"] for it in s.json().get("items", []) if it.get("id", {}).get("videoId")]
+            if not ids:
+                return []
+            # 2) Fetch real statistics for scoring.
+            v = await client.get(
+                "https://www.googleapis.com/youtube/v3/videos",
+                params={"part": "snippet,statistics", "id": ",".join(ids), "key": key},
+            )
+            v.raise_for_status()
             results = []
-            for item in items[:limit]:
+            for item in v.json().get("items", [])[:limit]:
                 snip = item.get("snippet", {})
-                stats = item.get("statistics", {})
-                views = int(stats.get("viewCount", 0))
+                views = int(item.get("statistics", {}).get("viewCount", 0))
                 score = min(100, int(views / 100000))
                 results.append({
                     "title": snip.get("title", "")[:100],
-                    "category": "Creator Economy",
-                    "score": max(50, score),
-                    "growth_pct": max(50, score * 3),
+                    "category": category if category != "all" else "Creator Economy",
+                    "score": max(55, score),
+                    "growth_pct": max(60, score * 3),
                     "sources": ["YouTube"],
                     "url": f"https://youtube.com/watch?v={item.get('id', '')}",
                 })
@@ -132,7 +208,7 @@ async def fetch_youtube_trends(limit: int = 5) -> list:
         return []
 
 async def get_live_trends(category: str = "all", limit: int = 10) -> list:
-    reddit, news, youtube = [], [], []
+    reddit, news, gnews, youtube = [], [], [], []
     try:
         reddit = await fetch_reddit_trends(category, limit // 2)
     except Exception:
@@ -142,11 +218,15 @@ async def get_live_trends(category: str = "all", limit: int = 10) -> list:
     except Exception:
         pass
     try:
-        youtube = await fetch_youtube_trends(limit // 3)
+        gnews = await fetch_google_news_trends(category, limit // 2)
+    except Exception:
+        pass
+    try:
+        youtube = await fetch_youtube_trends(category, limit // 3)
     except Exception:
         pass
 
-    live = reddit + news + youtube
+    live = reddit + news + gnews + youtube
     if not live:
         live = _STATIC_TRENDS
 

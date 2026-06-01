@@ -22,7 +22,8 @@ async def discover_trends(request: DiscoverRequest):
         category=request.category,
         limit=request.limit,
     )
-    return {"status": "success", "trends": trends, "count": len(trends)}
+    is_live = bool(trends and trends[0].get("is_live"))
+    return {"status": "success", "trends": trends, "count": len(trends), "is_live": is_live}
 
 
 @router.get("/categories")

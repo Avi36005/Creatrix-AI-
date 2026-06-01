@@ -10,6 +10,7 @@ from pydantic import BaseModel
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from services.track01_intelligence.ratefluencer_score import RatefluencerScoringEngine
 from services.ai_providers.gemini_client import GeminiClient
+from services import youtube_service, instagram_service
 
 router = APIRouter()
 engine = RatefluencerScoringEngine()
@@ -69,6 +70,39 @@ def _synthetic_metrics(handle: str) -> dict:
     }
 
 
+async def _real_metrics(handle: str, platform: str) -> Optional[dict]:
+    """
+    Try to pull REAL metrics from a live source based on platform.
+    YouTube (free) and Instagram (paid RapidAPI) supported. Returns a metrics
+    dict with a 'source' field, or None if no real data is available.
+    """
+    p = (platform or "").lower()
+    data = None
+    if p == "instagram":
+        data = await instagram_service.fetch_profile(handle)
+    elif p == "youtube":
+        data = await youtube_service.fetch_channel(handle)
+    else:
+        # Unknown platform: try YouTube first (free), then Instagram.
+        data = await youtube_service.fetch_channel(handle) or await instagram_service.fetch_profile(handle)
+
+    if not data or data.get("followers", 0) <= 0:
+        return None
+
+    return {
+        "handle": data.get("handle", handle),
+        "followers": data["followers"],
+        "engagement_rate": data.get("engagement_rate", 0.0),
+        "avg_likes": data.get("avg_likes", 0),
+        "avg_comments": data.get("avg_comments", 0),
+        "post_frequency": data.get("post_frequency", 1.0) or 1.0,
+        "avg_views": data.get("avg_views", 0),
+        "niche": _infer_niche(data.get("handle", handle)),
+        "source": data.get("source", "live"),
+        "extra": data,
+    }
+
+
 def _find_influencer(handle: str) -> Optional[dict]:
     data = _load_sample_influencers()
     handle_clean = handle.lower().lstrip("@")
@@ -110,34 +144,44 @@ async def analyze_influencer(request: AnalyzeRequest):
     if not request.handle:
         raise HTTPException(status_code=400, detail="Handle is required")
 
-    stored = _find_influencer(request.handle)
-
-    if stored:
-        details = stored.get("details", {})
-        followers = _parse_followers(details.get("followers", 100000))
-        eng = _parse_percent(details.get("engagement_rate", 3.0))
-        avg_views_raw = details.get("avg_views", 25000)
-        avg_views = _parse_followers(avg_views_raw)
-        post_freq = _parse_percent(
-            str(details.get("post_frequency", "3.0/wk")).split("/")[0]
-        )
-        avg_likes = int(followers * eng / 100)
-        avg_comments = int(avg_likes * 0.05)
-        niche = _infer_niche(stored.get("handle", ""))
-
-        metrics = {
-            "handle": request.handle,
-            "followers": followers,
-            "engagement_rate": eng,
-            "avg_likes": avg_likes,
-            "avg_comments": avg_comments,
-            "post_frequency": post_freq,
-            "avg_views": avg_views,
-            "niche": niche,
-        }
+    # 1) Prefer REAL live data (YouTube free / Instagram paid).
+    data_source = "live"
+    real = await _real_metrics(request.handle, request.platform)
+    if real:
+        metrics = real
+        niche = real["niche"]
+        data_source = real["source"]
     else:
-        metrics = _synthetic_metrics(request.handle)
-        niche = metrics["niche"]
+        # 2) Fall back to curated sample data, then synthetic.
+        stored = _find_influencer(request.handle)
+        if stored:
+            details = stored.get("details", {})
+            followers = _parse_followers(details.get("followers", 100000))
+            eng = _parse_percent(details.get("engagement_rate", 3.0))
+            avg_views_raw = details.get("avg_views", 25000)
+            avg_views = _parse_followers(avg_views_raw)
+            post_freq = _parse_percent(
+                str(details.get("post_frequency", "3.0/wk")).split("/")[0]
+            )
+            avg_likes = int(followers * eng / 100)
+            avg_comments = int(avg_likes * 0.05)
+            niche = _infer_niche(stored.get("handle", ""))
+
+            metrics = {
+                "handle": request.handle,
+                "followers": followers,
+                "engagement_rate": eng,
+                "avg_likes": avg_likes,
+                "avg_comments": avg_comments,
+                "post_frequency": post_freq,
+                "avg_views": avg_views,
+                "niche": niche,
+            }
+            data_source = "sample"
+        else:
+            metrics = _synthetic_metrics(request.handle)
+            niche = metrics["niche"]
+            data_source = "estimated"
 
     scores = engine.calculate_score(metrics)
     brands = engine.get_brand_matches(niche, scores)
@@ -164,9 +208,11 @@ async def analyze_influencer(request: AnalyzeRequest):
 
     return {
         "status": "success",
-        "handle": request.handle,
+        "handle": metrics.get("handle", request.handle),
         "platform": request.platform,
         "niche": niche,
+        "data_source": data_source,
+        "is_real": data_source in ("youtube", "instagram", "live"),
         "metrics": {
             "followers": metrics["followers"],
             "engagement_rate": metrics["engagement_rate"],
@@ -187,17 +233,21 @@ async def analyze_influencer(request: AnalyzeRequest):
 async def predict_growth(request: GrowthRequest):
     if not request.handle:
         raise HTTPException(status_code=400, detail="Handle is required")
-    stored = _find_influencer(request.handle)
-    if stored:
-        details = stored.get("details", {})
-        followers = _parse_followers(details.get("followers", 100000))
-        eng = _parse_percent(details.get("engagement_rate", 3.0))
-        post_freq = _parse_percent(
-            str(details.get("post_frequency", "3.0/wk")).split("/")[0]
-        )
+    real = await _real_metrics(request.handle, request.platform)
+    if real:
+        followers, eng, post_freq = real["followers"], real["engagement_rate"], real["post_frequency"]
     else:
-        m = _synthetic_metrics(request.handle)
-        followers, eng, post_freq = m["followers"], m["engagement_rate"], m["post_frequency"]
+        stored = _find_influencer(request.handle)
+        if stored:
+            details = stored.get("details", {})
+            followers = _parse_followers(details.get("followers", 100000))
+            eng = _parse_percent(details.get("engagement_rate", 3.0))
+            post_freq = _parse_percent(
+                str(details.get("post_frequency", "3.0/wk")).split("/")[0]
+            )
+        else:
+            m = _synthetic_metrics(request.handle)
+            followers, eng, post_freq = m["followers"], m["engagement_rate"], m["post_frequency"]
 
     growth = engine.predict_growth(followers, eng, post_freq, months=request.months)
     return {"status": "success", "handle": request.handle, "growth": growth}
@@ -207,16 +257,20 @@ async def predict_growth(request: GrowthRequest):
 async def check_authenticity(request: AuthenticityRequest):
     if not request.handle:
         raise HTTPException(status_code=400, detail="Handle is required")
-    stored = _find_influencer(request.handle)
-    if stored:
-        details = stored.get("details", {})
-        followers = _parse_followers(details.get("followers", 100000))
-        eng = _parse_percent(details.get("engagement_rate", 3.0))
-        avg_likes = int(followers * eng / 100)
-        avg_comments = int(avg_likes * 0.05)
+    real = await _real_metrics(request.handle, request.platform)
+    if real:
+        followers, avg_likes, avg_comments = real["followers"], real["avg_likes"], real["avg_comments"]
     else:
-        m = _synthetic_metrics(request.handle)
-        followers, avg_likes, avg_comments = m["followers"], m["avg_likes"], m["avg_comments"]
+        stored = _find_influencer(request.handle)
+        if stored:
+            details = stored.get("details", {})
+            followers = _parse_followers(details.get("followers", 100000))
+            eng = _parse_percent(details.get("engagement_rate", 3.0))
+            avg_likes = int(followers * eng / 100)
+            avg_comments = int(avg_likes * 0.05)
+        else:
+            m = _synthetic_metrics(request.handle)
+            followers, avg_likes, avg_comments = m["followers"], m["avg_likes"], m["avg_comments"]
 
     result = engine.detect_authenticity(followers, avg_likes, avg_comments)
     return {"status": "success", "handle": request.handle, "authenticity": result}

@@ -29,3 +29,6 @@ node_modules/
 dist/
 build/
 *.log
+
+# Deploy artifacts
+deploy_log*.txt

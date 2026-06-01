@@ -1475,7 +1475,7 @@
             <p>Perform an instant search evaluation on creator metrics and predicted benchmarks</p>
           </div>
           <div class="search-row">
-            <input type="text" class="input-handle" id="overview-handle-input" value="@ankita.creates" placeholder="Enter handle (e.g. @ankita.creates)">
+            <input type="text" class="input-handle" id="overview-handle-input" value="MrBeast" placeholder="Enter a channel / handle (e.g. MrBeast)">
             <button class="btn-action" id="btn-overview-analyze">Analyze</button>
           </div>
 
@@ -1593,13 +1593,13 @@
             <p>Analyze any creator profile with AI models & audit authenticity</p>
           </div>
           <div id="scorer-platform-selector" class="platform-selector">
-            <div class="platform-pill active" data-platform="instagram">Instagram</div>
+            <div class="platform-pill" data-platform="instagram">Instagram</div>
             <div class="platform-pill" data-platform="tiktok">TikTok</div>
-            <div class="platform-pill" data-platform="youtube">YouTube</div>
+            <div class="platform-pill active" data-platform="youtube">YouTube</div>
             <div class="platform-pill" data-platform="linkedin">LinkedIn</div>
           </div>
           <div class="search-row">
-            <input type="text" class="input-handle" id="scorer-handle-input" value="@ankita.creates" placeholder="Enter handle to query...">
+            <input type="text" class="input-handle" id="scorer-handle-input" value="MrBeast" placeholder="Enter a channel / handle (e.g. MrBeast)">
             <button class="btn-action" id="btn-scorer-analyze" data-original-text="Deep Analyze →">Deep Analyze →</button>
           </div>
 
@@ -1780,7 +1780,7 @@
           <p>Machine learning projection model predicting follower velocity curves</p>
         </div>
         <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-          <input type="text" class="input-handle" style="max-width: 320px; margin-bottom: 0;" id="pred-handle" value="@ankita.creates">
+          <input type="text" class="input-handle" style="max-width: 320px; margin-bottom: 0;" id="pred-handle" value="MrBeast">
           <div class="platform-selector" style="margin-bottom: 0; align-items: center;">
             <div class="platform-pill">3 Months</div>
             <div class="platform-pill active">6 Months</div>
@@ -1868,10 +1868,10 @@
           <div class="arc-gauge-box" style="margin-bottom: 28px;">
             <svg class="donut-svg" viewBox="0 0 120 120" style="width: 140px; height: 140px;">
               <circle cx="60" cy="60" r="45" class="donut-track"/>
-              <circle cx="60" cy="60" r="45" class="donut-segment" stroke="#3DD68C" stroke-dashoffset="26"/>
+              <circle cx="60" cy="60" r="45" class="donut-segment" id="auth-donut-seg" stroke="#3DD68C" stroke-dashoffset="26"/>
             </svg>
             <div style="position: absolute; text-align: center;">
-              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 800; color: var(--green);">91</div>
+              <div id="auth-authentic-score" style="font-family: var(--font-serif); font-size: 28px; font-weight: 800; color: var(--green);">91</div>
               <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase;">Authentic</div>
             </div>
           </div>
@@ -1898,12 +1898,12 @@
             <div class="panel-header">
               <h2>Fake Follower Estimate</h2>
             </div>
-            <div style="font-family: var(--font-serif); font-size: 48px; font-weight: 700; color: var(--green);">2.1%</div>
+            <div id="auth-fake-pct" style="font-family: var(--font-serif); font-size: 48px; font-weight: 700; color: var(--green);">2.1%</div>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Estimated fake followers</p>
             <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 12px;">
-              <div style="width: 2.1%; height: 100%; background: var(--red);"></div>
+              <div id="auth-fake-bar" style="width: 2.1%; height: 100%; background: var(--red);"></div>
             </div>
-            <p style="font-size: 13px; color: var(--text-muted);">Industry average: 12% — Creator is clean ✓</p>
+            <p id="auth-verdict-line" style="font-size: 13px; color: var(--text-muted);">Industry average: 12% — Creator is clean ✓</p>
           </div>
 
           <div class="white-card">
@@ -1977,7 +1977,7 @@
           <!-- Matching List -->
           <div>
             <h3 style="font-family: var(--font-serif); font-size: 16px; font-weight: 600; margin-bottom: 16px;">Top Brand Matches</h3>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div id="matcher-brand-list" style="display: flex; flex-direction: column; gap: 12px;">
               <div class="white-card" style="padding: 16px; margin-bottom: 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                   <strong style="font-family: var(--font-serif); font-size: 15px;">Nike</strong>
@@ -2656,6 +2656,142 @@
         settings: { title: "Settings Panel", sub: "Configure developer integration credentials" }
       };
 
+      // ════════════════════════════════════════════════════════════════════
+      // SHARED COMPANY STATE — one analyzed company, synced across every page
+      // ════════════════════════════════════════════════════════════════════
+      const CreatrixCompany = {
+        KEY: 'creatrix_active_company',
+        get() {
+          try { return JSON.parse(localStorage.getItem(this.KEY) || 'null'); }
+          catch (_) { return null; }
+        },
+        set(handle, platform, data) {
+          const rec = { handle, platform: platform || 'instagram', data: data || null, ts: Date.now() };
+          localStorage.setItem(this.KEY, JSON.stringify(rec));
+          this.syncInputs(handle);
+          this.renderBanner(rec);
+          return rec;
+        },
+        syncInputs(handle) {
+          if (!handle) return;
+          ['overview-handle-input', 'scorer-handle-input', 'pred-handle'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = handle;
+          });
+        },
+        renderBanner(rec) {
+          let bar = document.getElementById('creatrix-active-company');
+          if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'creatrix-active-company';
+            bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;display:flex;' +
+              'align-items:center;justify-content:center;gap:14px;padding:8px 16px;font-size:13px;' +
+              'background:#0f1117;color:#e6e8ee;border-top:1px solid #2a2f3a;font-family:var(--font-mono,monospace);';
+            document.body.appendChild(bar);
+          }
+          if (!rec || !rec.handle) { bar.style.display = 'none'; return; }
+          const d = rec.data || {};
+          const real = !!d.is_real;
+          const src = (d.data_source || 'estimated').toUpperCase();
+          const color = real ? '#3DD68C' : '#F5A623';
+          const label = real ? `LIVE · ${src}` : 'ESTIMATED (add API key for live data)';
+          bar.style.display = 'flex';
+          bar.innerHTML =
+            `<span>Active company: <strong style="color:#79A8FF;">${rec.handle}</strong> · ${rec.platform}</span>` +
+            `<span style="padding:2px 10px;border-radius:100px;background:${color}22;color:${color};font-weight:600;">${label}</span>`;
+        }
+      };
+
+      // Single render path: populate Scorer, Growth, Authenticity, Matcher
+      // panels from ONE /analyze payload so every page shows the same company.
+      function applyAnalysis(handle, platform, data) {
+        if (!data) return;
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+        const sc = data.scores || {};
+        const mt = data.metrics || {};
+        const auth = data.authenticity || {};
+        const growth = data.growth || {};
+        const niceHandle = data.handle || handle;
+
+        // ── Scorer panel ──────────────────────────────────────────────────
+        const avatarEl = document.getElementById('scorer-avatar');
+        if (avatarEl) {
+          const parts = String(niceHandle).replace('@', '').split(/[\._\-\s]/);
+          avatarEl.textContent = parts.map(p => p[0] || '').join('').toUpperCase().slice(0, 2);
+        }
+        setEl('scorer-handle-display', niceHandle);
+        setEl('scorer-platform-niche',
+          `${platform.charAt(0).toUpperCase() + platform.slice(1)} · ` +
+          `${(data.niche || 'general').charAt(0).toUpperCase() + (data.niche || 'general').slice(1)}`);
+        setEl('scorer-followers', formatNumber(mt.followers || 0));
+        setEl('scorer-avg-likes', formatNumber(mt.avg_likes || 0));
+        setEl('scorer-engagement', (mt.engagement_rate || 0) + '%');
+        const engPct = sc.engagement_score || 0, authPct = sc.authenticity_score || 0;
+        const growthPct = sc.growth_score || 0, brandPct = sc.brand_score || 0;
+        setEl('scorer-auth-pct', authPct + '%'); setStyle('scorer-auth-bar', 'width', authPct + '%');
+        setEl('scorer-eng-pct', engPct + '%'); setStyle('scorer-eng-bar', 'width', engPct + '%');
+        setEl('scorer-growth-pct', growthPct + '%'); setStyle('scorer-growth-bar', 'width', growthPct + '%');
+        setEl('scorer-brand-pct', brandPct + '%'); setStyle('scorer-brand-bar', 'width', brandPct + '%');
+        setEl('scorer-master-score', sc.ratefluencer_score || 0);
+        setEl('scorer-badge-eng', 'Engagement ' + engPct);
+        setEl('scorer-badge-auth', 'Authenticity ' + authPct);
+        setEl('scorer-badge-growth', 'Growth ' + growthPct);
+        setEl('scorer-badge-brand', 'Brand ' + brandPct);
+
+        // ── Brand matches (Scorer + Matcher panel) ────────────────────────
+        const brands = data.brand_matches || [];
+        const scorerBrandList = document.getElementById('scorer-brand-list');
+        if (scorerBrandList && brands.length) {
+          scorerBrandList.innerHTML = brands.map(b => `
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:4px;">
+                <span>${b.name}</span><span style="font-family:var(--font-mono);">${b.match_score}%</span>
+              </div>
+              <div style="height:6px;background:var(--border);border-radius:100px;overflow:hidden;">
+                <div style="width:${b.match_score}%;height:100%;background:var(--blue);"></div>
+              </div>
+            </div>`).join('');
+        }
+        const matcherList = document.getElementById('matcher-brand-list');
+        if (matcherList && brands.length) {
+          matcherList.innerHTML = brands.map(b => `
+            <div class="white-card" style="padding:16px;margin-bottom:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <strong style="font-family:var(--font-serif);font-size:15px;">${b.name}</strong>
+                <span class="badge badge-success">${b.match_score}% match</span>
+              </div>
+              <p style="font-size:12px;color:var(--text-muted);">${b.reason || 'Strong audience and brand-value alignment.'}</p>
+            </div>`).join('');
+        }
+
+        // ── Growth panel ──────────────────────────────────────────────────
+        const cards = document.querySelectorAll('#panel-growth .sub-score-val');
+        if (cards[0]) cards[0].textContent = formatNumber(growth.current || mt.followers || 0);
+        if (cards[1]) cards[1].textContent = formatNumber(growth.projected_6m || 0);
+        if (cards[2]) cards[2].textContent = '+' + (growth.monthly_rate || 0) + '%/mo';
+
+        // ── Authenticity panel ────────────────────────────────────────────
+        if (Object.keys(auth).length) {
+          const fakePct = auth.fake_follower_pct != null ? auth.fake_follower_pct : 0;
+          const genuine = auth.genuine_pct != null ? auth.genuine_pct : (100 - fakePct);
+          setEl('auth-authentic-score', Math.round(genuine));
+          setEl('auth-fake-pct', fakePct + '%');
+          setStyle('auth-fake-bar', 'width', Math.min(100, fakePct) + '%');
+          setEl('auth-verdict-line',
+            `${auth.authenticity_verdict || 'Analysis complete'} — pod risk: ${auth.engagement_pod_risk || 'low'}`);
+        }
+      }
+
+      // Re-render panels from stored company when navigating (no refetch needed).
+      function hydrateActiveCompany() {
+        const rec = CreatrixCompany.get();
+        if (!rec) return;
+        CreatrixCompany.syncInputs(rec.handle);
+        CreatrixCompany.renderBanner(rec);
+        if (rec.data) applyAnalysis(rec.handle, rec.platform, rec.data);
+      }
+
       menuItems.forEach(item => {
         item.addEventListener('click', () => {
           const tabId = item.getAttribute('data-tab');
@@ -2670,7 +2806,7 @@
           const activePanel = document.getElementById(`panel-${tabId}`);
           if (activePanel) {
             activePanel.classList.add('active');
-            
+
             // Animate arc gauges on panel entry
             const activeArc = activePanel.querySelector('.arc-fill');
             if (activeArc) {
@@ -2683,8 +2819,16 @@
             headerTitle.textContent = tabTitles[tabId].title;
             headerSubtitle.textContent = tabTitles[tabId].sub;
           }
+
+          // Keep the analyzed company's data visible on every data page.
+          if (['scorer', 'predictor', 'authenticity', 'matcher'].includes(tabId)) {
+            hydrateActiveCompany();
+          }
         });
       });
+
+      // Restore the active company on page load.
+      hydrateActiveCompany();
 
       // ----------------------------------------------------
       // Trend Feed Switcher
@@ -2770,6 +2914,21 @@
           overviewTerm.innerHTML = '';
           btnOverviewAnalyze.textContent = 'Analyzing...';
           btnOverviewAnalyze.disabled = true;
+
+          // Run a real influencer analysis and sync it across all pages.
+          fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/influencer/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ handle, platform: activeTrackPlatform() })
+          })
+            .then(r => r.ok ? r.json() : null)
+            .then(d => {
+              if (!d) return;
+              applyAnalysis(handle, activeTrackPlatform(), d);
+              CreatrixCompany.set(d.handle || handle, activeTrackPlatform(), d);
+              logOverviewTerm(`Synced ${d.handle || handle} across all pages · data: ${d.data_source || 'estimated'}`, 'done');
+            })
+            .catch(() => {});
 
           try {
             logOverviewTerm('Triggering ViraNova multi-agent workflow...', 'system');
@@ -2861,7 +3020,17 @@
       }
 
       // ─── Loading state helper ─────────────────────────────────────────────
-      // --- TRACK TOGGLE ---
+      // Current analysis platform. YouTube is the free real-data source, so it
+      // is the default — Instagram requires the paid RapidAPI key on the backend.
+      let currentPlatform = 'youtube';
+      function activeTrackPlatform() {
+        const pill = document.querySelector('#panel-scorer .platform-pill.active');
+        if (pill && pill.dataset.platform) return pill.dataset.platform;
+        return currentPlatform;
+      }
+
+      // --- TRACK TOGGLE --- now actually drives the platform: each button
+      // switches to its starting page and runs that track's primary action.
       function setActiveTrack(track) {
         const btns = { intel: 'toggle-intel', creator: 'toggle-creator', full: 'toggle-full' };
         const classes = { intel: 't-active-intel', creator: 't-active-creator', full: 't-active-full' };
@@ -2879,6 +3048,24 @@
         };
         const sub = document.getElementById('dashboard-subtitle');
         if (sub) sub.textContent = subtitles[track];
+
+        // Navigate to the track's home tab and trigger its primary action.
+        const go = (tab) => {
+          const item = document.querySelector(`.menu-item[data-tab="${tab}"]`);
+          if (item) item.click();
+        };
+        const clickIfPresent = (id) => { const b = document.getElementById(id); if (b) b.click(); };
+
+        if (track === 'intel') {
+          go('scorer');
+          clickIfPresent('btn-scorer-analyze');      // run real influencer analysis
+        } else if (track === 'creator') {
+          go('trends');
+          clickIfPresent('btn-refresh-trends');       // pull live trends
+        } else if (track === 'full') {
+          go('overview');
+          clickIfPresent('btn-overview-analyze');     // full multi-agent + analysis
+        }
       }
 
       function setLoading(btn, isLoading) {
@@ -2993,59 +3180,9 @@
             if (!response.ok) throw new Error('API error');
             const data = await response.json();
 
-            const sc = data.scores || {};
-            const mt = data.metrics || {};
-            const auth = data.authenticity || {};
-
-            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
-
-            // Avatar initials
-            const avatarEl = document.getElementById('scorer-avatar');
-            if (avatarEl) {
-              const parts = handleValue.replace('@','').split(/[\._-]/);
-              avatarEl.textContent = parts.map(p => p[0]).join('').toUpperCase().slice(0,2);
-            }
-            setEl('scorer-handle-display', handleValue);
-            setEl('scorer-platform-niche', `${platformValue.charAt(0).toUpperCase() + platformValue.slice(1)} · ${(data.niche || 'General').charAt(0).toUpperCase() + (data.niche||'general').slice(1)}`);
-
-            setEl('scorer-followers', formatNumber(mt.followers || 0));
-            setEl('scorer-avg-likes', formatNumber(mt.avg_likes || 0));
-            setEl('scorer-engagement', (mt.engagement_rate || 0) + '%');
-
-            const authPct = sc.authenticity_score || 0;
-            const engPct = sc.engagement_score || 0;
-            const growthPct = sc.growth_score || 0;
-            const brandPct = sc.brand_score || 0;
-            const masterPct = sc.ratefluencer_score || 0;
-
-            setEl('scorer-auth-pct', authPct + '%');
-            setStyle('scorer-auth-bar', 'width', authPct + '%');
-            setEl('scorer-eng-pct', engPct + '%');
-            setStyle('scorer-eng-bar', 'width', engPct + '%');
-            setEl('scorer-growth-pct', growthPct + '%');
-            setStyle('scorer-growth-bar', 'width', growthPct + '%');
-            setEl('scorer-brand-pct', brandPct + '%');
-            setStyle('scorer-brand-bar', 'width', brandPct + '%');
-            setEl('scorer-master-score', masterPct);
-            setEl('scorer-badge-eng', 'Engagement ' + engPct);
-            setEl('scorer-badge-auth', 'Authenticity ' + authPct);
-            setEl('scorer-badge-growth', 'Growth ' + growthPct);
-            setEl('scorer-badge-brand', 'Brand ' + brandPct);
-
-            // Brand matches
-            const brandList = document.getElementById('scorer-brand-list');
-            if (brandList && data.brand_matches) {
-              brandList.innerHTML = data.brand_matches.map(b => `
-                <div>
-                  <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:4px;">
-                    <span>${b.name}</span><span style="font-family:var(--font-mono);">${b.match_score}%</span>
-                  </div>
-                  <div style="height:6px;background:var(--border);border-radius:100px;overflow:hidden;">
-                    <div style="width:${b.match_score}%;height:100%;background:var(--blue);"></div>
-                  </div>
-                </div>`).join('');
-            }
+            // Render every panel + persist as the active company (cross-page sync).
+            applyAnalysis(handleValue, platformValue, data);
+            CreatrixCompany.set(data.handle || handleValue, platformValue, data);
           } catch (e) {
             const masterEl = document.getElementById('scorer-master-score');
             if (masterEl) masterEl.textContent = 'ERR';
@@ -3272,7 +3409,7 @@
       if (btnPredictGrowth) {
         btnPredictGrowth.addEventListener('click', async () => {
           const handleEl = document.getElementById('pred-handle');
-          const handle = handleEl ? handleEl.value.trim() : '@ankita.creates';
+          const handle = handleEl ? handleEl.value.trim() : 'MrBeast';
           const activePill = document.querySelector('#panel-growth .platform-pill.active');
           const horizonText = activePill ? activePill.textContent.trim() : '6 Months';
           const months = horizonText.includes('12') ? 12 : horizonText.includes('3') ? 3 : 6;
@@ -3283,7 +3420,7 @@
             const res = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/influencer/growth`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ handle, platform: 'instagram', months })
+              body: JSON.stringify({ handle, platform: activeTrackPlatform(), months })
             });
             if (!res.ok) throw new Error('API error');
             const d = await res.json();

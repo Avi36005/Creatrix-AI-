@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     RUNWAY_API_KEY: str = ""
     CORS_ORIGINS: str = "*"
 
+    # Paid Instagram data via RapidAPI (activates real IG metrics when set)
+    RAPIDAPI_KEY: str = ""
+    RAPIDAPI_INSTAGRAM_HOST: str = "instagram-scraper-api2.p.rapidapi.com"
+
     class Config:
         env_file = ".env"
         extra = "ignore"
