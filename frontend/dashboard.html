@@ -1390,39 +1390,39 @@
             <h2>Influencer Intelligence Engine</h2>
             <p>Analyze any creator profile with AI models & audit authenticity</p>
           </div>
-          <div class="platform-selector">
-            <div class="platform-pill active">Instagram</div>
-            <div class="platform-pill">TikTok</div>
-            <div class="platform-pill">YouTube</div>
-            <div class="platform-pill">LinkedIn</div>
+          <div id="scorer-platform-selector" class="platform-selector">
+            <div class="platform-pill active" data-platform="instagram">Instagram</div>
+            <div class="platform-pill" data-platform="tiktok">TikTok</div>
+            <div class="platform-pill" data-platform="youtube">YouTube</div>
+            <div class="platform-pill" data-platform="linkedin">LinkedIn</div>
           </div>
           <div class="search-row">
             <input type="text" class="input-handle" id="scorer-handle-input" value="@ankita.creates" placeholder="Enter handle to query...">
-            <button class="btn-action" id="btn-scorer-analyze">Deep Analyze →</button>
+            <button class="btn-action" id="btn-scorer-analyze" data-original-text="Deep Analyze →">Deep Analyze →</button>
           </div>
 
           <!-- Detailed Result Container -->
           <div class="white-card" style="margin-top: 24px; background: var(--light-bg); border-radius: 12px; padding: 20px; box-shadow: none;">
             <div class="result-header" style="margin-bottom: 20px;">
-              <div class="result-avatar">AK</div>
+              <div id="scorer-avatar" class="result-avatar">AK</div>
               <div class="result-info">
-                <h3>@ankita.creates</h3>
-                <p>Instagram · Fashion & Lifestyle</p>
+                <h3 id="scorer-handle-display">@ankita.creates</h3>
+                <p id="scorer-platform-niche">Instagram · Fashion &amp; Lifestyle</p>
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
               <div>
                 <span style="font-size: 11px; color: var(--text-faint); text-transform: uppercase;">Followers</span>
-                <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">2.4M</div>
+                <div id="scorer-followers" style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">2.4M</div>
               </div>
               <div>
                 <span style="font-size: 11px; color: var(--text-faint); text-transform: uppercase;">Avg. Likes</span>
-                <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">87K</div>
+                <div id="scorer-avg-likes" style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">87K</div>
               </div>
               <div>
                 <span style="font-size: 11px; color: var(--text-faint); text-transform: uppercase;">Engagement</span>
-                <div style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">6.8%</div>
+                <div id="scorer-engagement" style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">6.8%</div>
               </div>
             </div>
 
@@ -1431,37 +1431,37 @@
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                   <span>Authenticity Score</span>
-                  <span class="color-green">91%</span>
+                  <span id="scorer-auth-pct" class="color-green">91%</span>
                 </div>
                 <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;">
-                  <div style="width: 91%; height: 100%; background: var(--green);"></div>
+                  <div id="scorer-auth-bar" style="width: 91%; height: 100%; background: var(--green);"></div>
                 </div>
               </div>
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                   <span>Engagement Quality</span>
-                  <span class="color-blue">87%</span>
+                  <span id="scorer-eng-pct" class="color-blue">87%</span>
                 </div>
                 <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;">
-                  <div style="width: 87%; height: 100%; background: var(--blue);"></div>
+                  <div id="scorer-eng-bar" style="width: 87%; height: 100%; background: var(--blue);"></div>
                 </div>
               </div>
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                   <span>Follower Growth</span>
-                  <span class="color-blue">73%</span>
+                  <span id="scorer-growth-pct" class="color-blue">73%</span>
                 </div>
                 <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;">
-                  <div style="width: 73%; height: 100%; background: var(--blue);"></div>
+                  <div id="scorer-growth-bar" style="width: 73%; height: 100%; background: var(--blue);"></div>
                 </div>
               </div>
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
-                  <span>Content Consistency</span>
-                  <span class="color-purple">82%</span>
+                  <span>Brand Match</span>
+                  <span id="scorer-brand-pct" class="color-purple">82%</span>
                 </div>
                 <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;">
-                  <div style="width: 82%; height: 100%; background: var(--purple);"></div>
+                  <div id="scorer-brand-bar" style="width: 82%; height: 100%; background: var(--purple);"></div>
                 </div>
               </div>
             </div>
@@ -1469,13 +1469,13 @@
             <!-- Centered Master Score Circle -->
             <div class="white-card" style="margin-top: 24px; padding: 24px; text-align: center; box-shadow: none;">
               <span style="font-size: 12px; font-weight: 600; color: var(--text-faint); text-transform: uppercase;">Master Score</span>
-              <div style="font-family: var(--font-serif); font-size: 64px; font-weight: 800; color: var(--blue); line-height: 1.1;">94</div>
+              <div id="scorer-master-score" style="font-family: var(--font-serif); font-size: 64px; font-weight: 800; color: var(--blue); line-height: 1.1;">94</div>
               <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">/100 Ratefluencer Score™</div>
               <div style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;">
-                <span class="badge badge-info" style="font-size: 11px;">Engagement 96</span>
-                <span class="badge badge-success" style="font-size: 11px;">Authenticity 91</span>
-                <span class="badge badge-info" style="font-size: 11px;">Growth 88</span>
-                <span class="badge badge-warning" style="font-size: 11px;">Brand 94</span>
+                <span id="scorer-badge-eng" class="badge badge-info" style="font-size: 11px;">Engagement 96</span>
+                <span id="scorer-badge-auth" class="badge badge-success" style="font-size: 11px;">Authenticity 91</span>
+                <span id="scorer-badge-growth" class="badge badge-info" style="font-size: 11px;">Growth 88</span>
+                <span id="scorer-badge-brand" class="badge badge-warning" style="font-size: 11px;">Brand 94</span>
               </div>
             </div>
           </div>
@@ -1534,7 +1534,7 @@
             <div class="panel-header">
               <h2>Best Brand Partnerships</h2>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div id="scorer-brand-list" style="display: flex; flex-direction: column; gap: 12px;">
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 4px;">
                   <span>Nike</span>
@@ -1896,7 +1896,7 @@
 
           <div style="display: flex; gap: 10px;">
             <button class="btn-action" style="flex: 1;" id="btn-trend-gen-script">Generate Script</button>
-            <button class="btn-action" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-dark);">Queue Post</button>
+            <button class="btn-action" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-dark);" id="btn-refresh-trends" data-original-text="Refresh Trends">Refresh Trends</button>
           </div>
         </div>
       </div>
@@ -1915,25 +1915,25 @@
           </div>
 
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">TOPIC OR ARTICLE URL</label>
-          <textarea class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="Enter theme (e.g. AI tools for content creators)...">AI tools for content creators</textarea>
+          <textarea id="script-topic-input" class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="Enter theme (e.g. AI tools for content creators)...">AI tools for content creators</textarea>
 
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">DURATION</label>
-          <div class="platform-selector">
-            <div class="platform-pill">15s</div>
-            <div class="platform-pill active">30s</div>
-            <div class="platform-pill">45s</div>
-            <div class="platform-pill">60s</div>
+          <div id="script-duration-selector" class="platform-selector">
+            <div class="platform-pill" data-duration="15">15s</div>
+            <div class="platform-pill active" data-duration="30">30s</div>
+            <div class="platform-pill" data-duration="45">45s</div>
+            <div class="platform-pill" data-duration="60">60s</div>
           </div>
 
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">CONTENT STYLE</label>
-          <div class="style-pill-grid">
-            <div class="style-pill-card active">Hooks & Story</div>
-            <div class="style-pill-card">Educational</div>
-            <div class="style-pill-card">Controversy</div>
-            <div class="style-pill-card">Motivational</div>
+          <div id="script-style-selector" class="style-pill-grid">
+            <div class="style-pill-card active" data-style="hooks">Hooks &amp; Story</div>
+            <div class="style-pill-card" data-style="educational">Educational</div>
+            <div class="style-pill-card" data-style="controversy">Controversy</div>
+            <div class="style-pill-card" data-style="motivational">Motivational</div>
           </div>
 
-          <button class="btn-action" style="width: 100%;" id="btn-generate-script">Generate Script →</button>
+          <button class="btn-action" style="width: 100%;" id="btn-generate-script" data-original-text="Generate Script →">Generate Script →</button>
         </div>
 
         <!-- Output display -->
@@ -1949,22 +1949,22 @@
           <div style="display: flex; flex-direction: column; gap: 16px;">
             <div class="script-block" style="background: #FFFDF5; border-left: 4px solid var(--amber);">
               <span class="script-block-pill" style="background: #FFF3E0; color: var(--amber);">HOOK</span>
-              <div class="script-block-text">"Stop scrolling — AI just changed the creator game forever. What happens next will shock most brands..."</div>
+              <div id="script-out-hook" class="script-block-text">"Stop scrolling — AI just changed the creator game forever. What happens next will shock most brands..."</div>
               <span class="script-block-time">0–5 sec</span>
             </div>
             <div class="script-block" style="background: #F8FAFF; border-left: 4px solid var(--blue);">
               <span class="script-block-pill" style="background: #E8F0FE; color: var(--blue);">STORY</span>
-              <div class="script-block-text">"Brands are now using AI to predict which creators will blow up BEFORE they become mainstream. Here's exactly how it works..."</div>
+              <div id="script-out-story" class="script-block-text">"Brands are now using AI to predict which creators will blow up BEFORE they become mainstream. Here's exactly how it works..."</div>
               <span class="script-block-time">5–20 sec</span>
             </div>
             <div class="script-block" style="background: #F5FDF9; border-left: 4px solid var(--green);">
               <span class="script-block-pill" style="background: #E8FDF3; color: var(--green);">INSIGHT</span>
-              <div class="script-block-text">"Companies using AI influencer scoring see 3x higher campaign ROI. The data doesn't lie..."</div>
+              <div id="script-out-insight" class="script-block-text">"Companies using AI influencer scoring see 3x higher campaign ROI. The data doesn't lie..."</div>
               <span class="script-block-time">20–25 sec</span>
             </div>
             <div class="script-block" style="background: #FAF5FF; border-left: 4px solid var(--purple);">
               <span class="script-block-pill" style="background: #F3E8FD; color: var(--purple);">CTA</span>
-              <div class="script-block-text">"Follow @creatrix.ai and get the full AI creator intelligence playbook — link in bio 👇"</div>
+              <div id="script-out-cta" class="script-block-text">"Follow @creatrix.ai and get the full AI creator intelligence playbook — link in bio 👇"</div>
               <span class="script-block-time">25–30 sec</span>
             </div>
           </div>
@@ -2115,8 +2115,8 @@
             <p>Formulate highly viral thought leadership content structures</p>
           </div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">TOPIC OR SENTIMENT</label>
-          <textarea class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="CMOs and creator marketing..."></textarea>
-          <button class="btn-action" style="width: 100%;" id="btn-generate-linkedin">Generate LinkedIn Post →</button>
+          <textarea id="linkedin-topic-input" class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="CMOs and creator marketing..."></textarea>
+          <button class="btn-action" style="width: 100%;" id="btn-generate-linkedin" data-original-text="Generate LinkedIn Post →">Generate LinkedIn Post →</button>
         </div>
 
         <!-- Preview Mockup Card -->
@@ -2128,11 +2128,11 @@
               <p style="font-size: 12px; color: var(--text-faint);">AI Platform · Just now</p>
             </div>
           </div>
-          <p style="font-size: 14px; line-height: 1.6; color: var(--text-dark); margin-bottom: 12px;">
+          <p id="linkedin-out-text" style="font-size: 14px; line-height: 1.6; color: var(--text-dark); margin-bottom: 12px;">
             The creator economy is being rewritten by AI.<br><br>
             Here's what smart brands are doing differently in 2026...
           </p>
-          <div style="font-size: 12px; color: #0A66C2; margin-bottom: 16px;">#CreatorEconomy #AIMarketing #Creatrix AI</div>
+          <div id="linkedin-out-hashtags" style="font-size: 12px; color: #0A66C2; margin-bottom: 16px;">#CreatorEconomy #AIMarketing #Creatrix AI</div>
           <div style="display: flex; gap: 12px; font-size: 12px; color: var(--text-faint); border-top: 1px solid var(--border); padding-top: 12px;">
             <span>👍 142 Likes</span>
             <span>💬 38 Comments</span>
@@ -2151,8 +2151,8 @@
             <h2>Instagram Caption Tool</h2>
             <p>Optimized caption copy with correct linebreaks</p>
           </div>
-          <textarea class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="The algorithm rewards authenticity..."></textarea>
-          <button class="btn-action" style="width: 100%;" id="btn-generate-instagram">Generate Caption →</button>
+          <textarea id="instagram-topic-input" class="input-handle" style="height: 120px; border-radius: 12px; resize: none; margin-bottom: 20px;" placeholder="The algorithm rewards authenticity..."></textarea>
+          <button class="btn-action" style="width: 100%;" id="btn-generate-instagram" data-original-text="Generate Caption →">Generate Caption →</button>
         </div>
 
         <div class="white-card" style="padding: 24px;">
@@ -2160,7 +2160,7 @@
             IMAGE PREVIEW
           </div>
           <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">@creatrix.ai</div>
-          <p style="font-size: 13px; line-height: 1.5; color: var(--text-dark);">
+          <p id="instagram-out-caption" style="font-size: 13px; line-height: 1.5; color: var(--text-dark);">
             The algorithm rewards authenticity 🤖✨<br><br>
             Stop chasing vanity metrics. Here's how creators are using AI to stay real...
           </p>
@@ -2177,7 +2177,20 @@
           <h2>Virality Prediction Engine</h2>
           <p>Estimate content execution value boundaries before pushing live</p>
         </div>
-        
+
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 8px;">PASTE YOUR SCRIPT OR HOOK TO ANALYZE</label>
+          <textarea id="virality-script-input" class="input-handle" style="height: 100px; border-radius: 12px; resize: none; margin-bottom: 12px;" placeholder="Enter your script, hook, or caption text...">Stop scrolling — AI just changed the creator game forever. Here's what nobody is telling you about influence in 2026...</textarea>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="platform-selector" style="margin-bottom: 0;">
+              <div class="platform-pill active" data-platform="instagram">Instagram</div>
+              <div class="platform-pill" data-platform="tiktok">TikTok</div>
+              <div class="platform-pill" data-platform="youtube">YouTube</div>
+            </div>
+            <button class="btn-action" id="btn-predict-virality" data-original-text="Predict Virality →" style="margin-left: auto;">Predict Virality →</button>
+          </div>
+        </div>
+
         <div class="two-col-grid">
           <div class="white-card" style="box-shadow: none; border-color: var(--border); padding: 20px;">
             <div class="arc-gauge-box" style="margin-bottom: 24px;">
@@ -2185,8 +2198,8 @@
                 <path d="M 30 120 A 90 90 0 0 1 210 120" class="arc-bg" style="stroke-width: 16;"/>
                 <path d="M 30 120 A 90 90 0 0 1 210 120" class="arc-fill" id="virality-arc-fill" style="stroke-width: 16; stroke-dasharray: 300; stroke-dashoffset: 300;" stroke-dashoffset="39"/>
               </svg>
-              <div class="arc-value" style="font-size: 48px; bottom: 30px;">87</div>
-              <div class="arc-label" style="bottom: 10px;">Virality Score</div>
+              <div id="virality-score-val" class="arc-value" style="font-size: 48px; bottom: 30px;">87</div>
+              <div id="virality-grade-lbl" class="arc-label" style="bottom: 10px;">Virality Score</div>
             </div>
 
             <!-- Contributing factor bars -->
@@ -2194,16 +2207,19 @@
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                   <span>Hook Strength</span>
-                  <span class="color-green">92%</span>
+                  <span id="virality-hook-pct" class="color-green">92%</span>
                 </div>
-                <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;"><div style="width: 92%; height: 100%; background: var(--green);"></div></div>
+                <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;"><div id="virality-hook-bar" style="width: 92%; height: 100%; background: var(--green);"></div></div>
               </div>
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                   <span>Content Novelty</span>
-                  <span class="color-blue">85%</span>
+                  <span id="virality-novelty-pct" class="color-blue">85%</span>
                 </div>
-                <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;"><div style="width: 85%; height: 100%; background: var(--blue);"></div></div>
+                <div style="height: 6px; background: var(--border); border-radius: 100px; overflow: hidden;"><div id="virality-novelty-bar" style="width: 85%; height: 100%; background: var(--blue);"></div></div>
+              </div>
+              <div style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">
+                <strong id="virality-recommendation">Strong hook — add a pattern interrupt at 10s.</strong>
               </div>
             </div>
           </div>
@@ -2212,13 +2228,23 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="sub-score-card" style="padding: 24px;">
               <span style="font-size: 28px;">👁️</span>
-              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">2.4M</div>
+              <div id="virality-views" style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">2.4M</div>
               <div style="font-size: 12px; color: var(--text-faint); margin-top: 4px;">Expected Views</div>
             </div>
             <div class="sub-score-card" style="padding: 24px;">
               <span style="font-size: 28px;">❤️</span>
-              <div style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">180K</div>
+              <div id="virality-likes" style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">180K</div>
               <div style="font-size: 12px; color: var(--text-faint); margin-top: 4px;">Expected Likes</div>
+            </div>
+            <div class="sub-score-card" style="padding: 24px;">
+              <span style="font-size: 28px;">📤</span>
+              <div id="virality-shares" style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">42K</div>
+              <div style="font-size: 12px; color: var(--text-faint); margin-top: 4px;">Expected Shares</div>
+            </div>
+            <div class="sub-score-card" style="padding: 24px;">
+              <span style="font-size: 28px;">🔖</span>
+              <div id="virality-saves" style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--blue); margin-top: 8px;">38K</div>
+              <div style="font-size: 12px; color: var(--text-faint); margin-top: 4px;">Expected Saves</div>
             </div>
           </div>
         </div>
@@ -2540,20 +2566,19 @@
           btnOverviewAnalyze.disabled = true;
 
           try {
-            logOverviewTerm('Triggering RAG model indexing queries...', 'system');
-            
-            // Try fetching from the local FastAPI backend (port 8001)
+            logOverviewTerm('Triggering ViraNova multi-agent workflow...', 'system');
+
             const response = await fetch('http://localhost:8001/api/v1/agent/run', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ input: handle, task: "full_analysis" })
+              body: JSON.stringify({ input: handle, task: 'full_analysis', platform: 'instagram' })
             });
 
             if (!response.ok) throw new Error('API server unreachable');
 
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
-            
+
             while (true) {
               const { value, done } = await reader.read();
               if (done) break;
@@ -2561,18 +2586,21 @@
               const lines = chunk.split('\n');
               for (const line of lines) {
                 if (line.startsWith('data: ')) {
-                  const data = JSON.parse(line.substring(6));
-                  logOverviewTerm(data.step, data.status);
+                  try {
+                    const evt = JSON.parse(line.substring(6));
+                    const pct = evt.progress ? ` [${evt.progress}%]` : '';
+                    const status = evt.progress === 100 ? 'done' : 'info';
+                    logOverviewTerm(`${evt.message}${pct}`, status);
+                  } catch (_) {}
                 }
               }
             }
           } catch (e) {
-            // Fallback offline simulator
-            logOverviewTerm('FastAPI agent connection offline. Running backup local pipeline...', 'system');
-            setTimeout(() => logOverviewTerm('Searching dense vector indexes in Pinecone RAG...', 'info'), 600);
-            setTimeout(() => logOverviewTerm('Running XGBoost & LightGBM ensemble evaluation...', 'info'), 1300);
-            setTimeout(() => logOverviewTerm('Generating content script drafts with Llama3 model...', 'info'), 2000);
-            setTimeout(() => logOverviewTerm('Creatrix AI agent workflows executed successfully! ✓', 'done'), 2600);
+            logOverviewTerm('FastAPI agent offline. Running local simulation...', 'system');
+            setTimeout(() => logOverviewTerm('Scanning trend signals on Reddit, LinkedIn, YouTube...', 'info'), 600);
+            setTimeout(() => logOverviewTerm('Running Ratefluencer Score™ ML calculation...', 'info'), 1300);
+            setTimeout(() => logOverviewTerm('Generating viral hook scripts with Claude AI...', 'info'), 2000);
+            setTimeout(() => logOverviewTerm('Creatrix AI workflow complete! ✓', 'done'), 2600);
           } finally {
             setTimeout(() => {
               btnOverviewAnalyze.textContent = 'Analyze';
@@ -2586,18 +2614,402 @@
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
         const div = document.createElement('div');
         div.className = 'terminal-line';
-        
         let colorClass = '';
         if (status === 'system') colorClass = 'system';
         if (status === 'done') colorClass = 'done';
-
-        div.innerHTML = `
-          <span class="term-ts">[${time}]</span>
-          <span class="term-msg ${colorClass}">${msg}</span>
-        `;
+        div.innerHTML = `<span class="term-ts">[${time}]</span><span class="term-msg ${colorClass}">${msg}</span>`;
         overviewTerm.appendChild(div);
         overviewTerm.scrollTop = overviewTerm.scrollHeight;
       }
+
+      // ─── Loading state helper ─────────────────────────────────────────────
+      function setLoading(btn, isLoading) {
+        if (!btn) return;
+        btn.disabled = isLoading;
+        btn.textContent = isLoading ? 'Processing...' : (btn.dataset.originalText || btn.textContent);
+      }
+
+      function formatNumber(n) {
+        if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+        return String(n);
+      }
+
+      // ─── Platform pill selector helper ────────────────────────────────────
+      function activatePill(container, clickedPill) {
+        container.querySelectorAll('.platform-pill').forEach(p => p.classList.remove('active'));
+        clickedPill.classList.add('active');
+      }
+
+      function activateStylePill(container, clickedPill) {
+        container.querySelectorAll('.style-pill-card').forEach(p => p.classList.remove('active'));
+        clickedPill.classList.add('active');
+      }
+
+      // ─── Script Generator ─────────────────────────────────────────────────
+      const btnGenerateScript = document.getElementById('btn-generate-script');
+      const scriptDurationSel = document.getElementById('script-duration-selector');
+      const scriptStyleSel = document.getElementById('script-style-selector');
+
+      if (scriptDurationSel) {
+        scriptDurationSel.querySelectorAll('.platform-pill').forEach(pill => {
+          pill.addEventListener('click', () => activatePill(scriptDurationSel, pill));
+        });
+      }
+      if (scriptStyleSel) {
+        scriptStyleSel.querySelectorAll('.style-pill-card').forEach(pill => {
+          pill.addEventListener('click', () => activateStylePill(scriptStyleSel, pill));
+        });
+      }
+
+      if (btnGenerateScript) {
+        btnGenerateScript.addEventListener('click', async () => {
+          const topicEl = document.getElementById('script-topic-input');
+          const topicValue = topicEl ? topicEl.value.trim() : 'AI tools for creators';
+          if (!topicValue) return;
+
+          const activeDuration = scriptDurationSel
+            ? (scriptDurationSel.querySelector('.platform-pill.active') || {}).dataset?.duration || '30'
+            : '30';
+          const activeStyle = scriptStyleSel
+            ? (scriptStyleSel.querySelector('.style-pill-card.active') || {}).dataset?.style || 'hooks'
+            : 'hooks';
+
+          setLoading(btnGenerateScript, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/content/generate-script', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ topic: topicValue, duration: parseInt(activeDuration), style: activeStyle })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+            const safe = (v) => v || '';
+            const hookEl = document.getElementById('script-out-hook');
+            const storyEl = document.getElementById('script-out-story');
+            const insightEl = document.getElementById('script-out-insight');
+            const ctaEl = document.getElementById('script-out-cta');
+            if (hookEl) hookEl.textContent = safe(data.hook);
+            if (storyEl) storyEl.textContent = safe(data.story);
+            if (insightEl) insightEl.textContent = safe(data.insight);
+            if (ctaEl) ctaEl.textContent = safe(data.cta);
+          } catch (e) {
+            const hookEl = document.getElementById('script-out-hook');
+            if (hookEl) hookEl.textContent = 'API offline — configure backend to get AI-generated scripts.';
+          } finally {
+            setLoading(btnGenerateScript, false);
+          }
+        });
+      }
+
+      // ─── Influencer Scorer ────────────────────────────────────────────────
+      const btnScorerAnalyze = document.getElementById('btn-scorer-analyze');
+      const scorerPlatformSel = document.getElementById('scorer-platform-selector');
+
+      if (scorerPlatformSel) {
+        scorerPlatformSel.querySelectorAll('.platform-pill').forEach(pill => {
+          pill.addEventListener('click', () => activatePill(scorerPlatformSel, pill));
+        });
+      }
+
+      if (btnScorerAnalyze) {
+        btnScorerAnalyze.addEventListener('click', async () => {
+          const handleInput = document.getElementById('scorer-handle-input');
+          const handleValue = handleInput ? handleInput.value.trim() : '';
+          if (!handleValue) return;
+
+          const activePlatformPill = scorerPlatformSel
+            ? scorerPlatformSel.querySelector('.platform-pill.active')
+            : null;
+          const platformValue = activePlatformPill
+            ? (activePlatformPill.dataset.platform || 'instagram')
+            : 'instagram';
+
+          setLoading(btnScorerAnalyze, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/influencer/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ handle: handleValue, platform: platformValue })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+
+            const sc = data.scores || {};
+            const mt = data.metrics || {};
+            const auth = data.authenticity || {};
+
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+
+            // Avatar initials
+            const avatarEl = document.getElementById('scorer-avatar');
+            if (avatarEl) {
+              const parts = handleValue.replace('@','').split(/[\._-]/);
+              avatarEl.textContent = parts.map(p => p[0]).join('').toUpperCase().slice(0,2);
+            }
+            setEl('scorer-handle-display', handleValue);
+            setEl('scorer-platform-niche', `${platformValue.charAt(0).toUpperCase() + platformValue.slice(1)} · ${(data.niche || 'General').charAt(0).toUpperCase() + (data.niche||'general').slice(1)}`);
+
+            setEl('scorer-followers', formatNumber(mt.followers || 0));
+            setEl('scorer-avg-likes', formatNumber(mt.avg_likes || 0));
+            setEl('scorer-engagement', (mt.engagement_rate || 0) + '%');
+
+            const authPct = sc.authenticity_score || 0;
+            const engPct = sc.engagement_score || 0;
+            const growthPct = sc.growth_score || 0;
+            const brandPct = sc.brand_score || 0;
+            const masterPct = sc.ratefluencer_score || 0;
+
+            setEl('scorer-auth-pct', authPct + '%');
+            setStyle('scorer-auth-bar', 'width', authPct + '%');
+            setEl('scorer-eng-pct', engPct + '%');
+            setStyle('scorer-eng-bar', 'width', engPct + '%');
+            setEl('scorer-growth-pct', growthPct + '%');
+            setStyle('scorer-growth-bar', 'width', growthPct + '%');
+            setEl('scorer-brand-pct', brandPct + '%');
+            setStyle('scorer-brand-bar', 'width', brandPct + '%');
+            setEl('scorer-master-score', masterPct);
+            setEl('scorer-badge-eng', 'Engagement ' + engPct);
+            setEl('scorer-badge-auth', 'Authenticity ' + authPct);
+            setEl('scorer-badge-growth', 'Growth ' + growthPct);
+            setEl('scorer-badge-brand', 'Brand ' + brandPct);
+
+            // Brand matches
+            const brandList = document.getElementById('scorer-brand-list');
+            if (brandList && data.brand_matches) {
+              brandList.innerHTML = data.brand_matches.map(b => `
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:4px;">
+                    <span>${b.name}</span><span style="font-family:var(--font-mono);">${b.match_score}%</span>
+                  </div>
+                  <div style="height:6px;background:var(--border);border-radius:100px;overflow:hidden;">
+                    <div style="width:${b.match_score}%;height:100%;background:var(--blue);"></div>
+                  </div>
+                </div>`).join('');
+            }
+          } catch (e) {
+            const masterEl = document.getElementById('scorer-master-score');
+            if (masterEl) masterEl.textContent = 'ERR';
+          } finally {
+            setLoading(btnScorerAnalyze, false);
+          }
+        });
+      }
+
+      // ─── Virality Predictor ───────────────────────────────────────────────
+      const btnPredictVirality = document.getElementById('btn-predict-virality');
+      const viralityPlatformSel = document.querySelector('#panel-virality .platform-selector');
+
+      if (viralityPlatformSel) {
+        viralityPlatformSel.querySelectorAll('.platform-pill').forEach(pill => {
+          pill.addEventListener('click', () => activatePill(viralityPlatformSel, pill));
+        });
+      }
+
+      if (btnPredictVirality) {
+        btnPredictVirality.addEventListener('click', async () => {
+          const scriptInput = document.getElementById('virality-script-input');
+          const scriptText = scriptInput ? scriptInput.value.trim() : '';
+          if (!scriptText) return;
+
+          const activePill = viralityPlatformSel
+            ? viralityPlatformSel.querySelector('.platform-pill.active')
+            : null;
+          const platform = activePill ? (activePill.dataset.platform || 'instagram') : 'instagram';
+
+          setLoading(btnPredictVirality, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/content/predict-virality', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ script_text: scriptText, platform: platform })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+
+            const score = data.virality_score || 0;
+            const hookStr = data.hook_strength || 0;
+            const novelty = data.content_novelty || 0;
+
+            setEl('virality-score-val', score);
+            setEl('virality-grade-lbl', 'Grade: ' + (data.grade || 'B'));
+            setEl('virality-hook-pct', hookStr + '%');
+            setStyle('virality-hook-bar', 'width', hookStr + '%');
+            setEl('virality-novelty-pct', novelty + '%');
+            setStyle('virality-novelty-bar', 'width', novelty + '%');
+            setEl('virality-recommendation', data.recommendation || '');
+            setEl('virality-views', formatNumber(data.expected_views || 0));
+            setEl('virality-likes', formatNumber(data.expected_likes || 0));
+            setEl('virality-shares', formatNumber(data.expected_shares || 0));
+            setEl('virality-saves', formatNumber(data.expected_saves || 0));
+
+            // Update arc gauge (dashoffset 300 = 0%, 0 = 100%)
+            const arcFill = document.getElementById('virality-arc-fill');
+            if (arcFill) {
+              arcFill.style.strokeDashoffset = String(300 - (score / 100) * 300);
+            }
+          } catch (e) {
+            document.getElementById('virality-score-val').textContent = 'ERR';
+          } finally {
+            setLoading(btnPredictVirality, false);
+          }
+        });
+      }
+
+      // ─── Trend Discovery ──────────────────────────────────────────────────
+      const btnRefreshTrends = document.getElementById('btn-refresh-trends');
+      const trendFeedItems = document.getElementById('trend-feed-items');
+
+      if (btnRefreshTrends) {
+        btnRefreshTrends.addEventListener('click', async () => {
+          setLoading(btnRefreshTrends, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/trends/discover', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category: 'all', limit: 10 })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+            const trendsArr = data.trends || [];
+
+            if (trendFeedItems && trendsArr.length > 0) {
+              trendFeedItems.innerHTML = trendsArr.map((t, i) => `
+                <div class="trend-row-item${i === 0 ? ' active' : ''}" data-trend-index="${i}">
+                  <div class="trend-main-info">
+                    <div class="trend-header-pill">
+                      <span class="trend-rank">#${i+1}</span>
+                      <span class="trend-title">${t.title}</span>
+                      <span class="badge badge-info" style="font-size:10px;padding:2px 6px;">${t.category}</span>
+                    </div>
+                    <div class="trend-sources-pills">
+                      ${(t.sources||[]).map(s => `<span class="source-mini-tag">${s}</span>`).join('')}
+                    </div>
+                  </div>
+                  <div class="trend-meta-stats">
+                    <span class="trend-row-score">${t.score}</span>
+                    <span class="trend-growth-percent">↑ ${t.growth_velocity}</span>
+                  </div>
+                </div>`).join('');
+
+              // Re-attach click handlers for trend rows
+              trendFeedItems.querySelectorAll('.trend-row-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  trendFeedItems.querySelectorAll('.trend-row-item').forEach(el => el.classList.remove('active'));
+                  item.classList.add('active');
+                  const titleEl = item.querySelector('.trend-title');
+                  const scoreEl = item.querySelector('.trend-row-score');
+                  const catEl = item.querySelector('.badge-info');
+                  if (trendTitle && titleEl) trendTitle.textContent = titleEl.textContent;
+                  if (trendScore && scoreEl) trendScore.textContent = scoreEl.textContent;
+                  if (trendCat && catEl) trendCat.textContent = catEl.textContent;
+                  const strokeOffset = 220 - (parseFloat(scoreEl?.textContent || 0) / 100) * 220;
+                  if (trendArc) trendArc.style.strokeDashoffset = strokeOffset;
+                });
+              });
+
+              // Update detail pane with first trend
+              if (trendsArr[0]) {
+                if (trendTitle) trendTitle.textContent = trendsArr[0].title;
+                if (trendScore) trendScore.textContent = String(trendsArr[0].score);
+                if (trendCat) trendCat.textContent = trendsArr[0].category;
+              }
+            }
+          } catch (e) {
+            // silently fail - trends panel keeps static data
+          } finally {
+            setLoading(btnRefreshTrends, false);
+          }
+        });
+      }
+
+      // ─── LinkedIn Post Generator ──────────────────────────────────────────
+      const btnGenerateLinkedIn = document.getElementById('btn-generate-linkedin');
+
+      if (btnGenerateLinkedIn) {
+        btnGenerateLinkedIn.addEventListener('click', async () => {
+          const topicEl = document.getElementById('linkedin-topic-input');
+          const topicValue = topicEl ? topicEl.value.trim() : '';
+          if (!topicValue) return;
+
+          setLoading(btnGenerateLinkedIn, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/content/linkedin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ topic: topicValue, audience: 'professionals' })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+
+            const textEl = document.getElementById('linkedin-out-text');
+            const hashEl = document.getElementById('linkedin-out-hashtags');
+            if (textEl && data.post_text) {
+              textEl.innerHTML = data.post_text.replace(/\n/g, '<br>');
+            }
+            if (hashEl && data.hashtags) {
+              hashEl.textContent = data.hashtags.join(' ');
+            }
+          } catch (e) {
+            const textEl = document.getElementById('linkedin-out-text');
+            if (textEl) textEl.textContent = 'API offline — configure backend for AI-generated posts.';
+          } finally {
+            setLoading(btnGenerateLinkedIn, false);
+          }
+        });
+      }
+
+      // ─── Instagram Caption Generator ─────────────────────────────────────
+      const btnGenerateInstagram = document.getElementById('btn-generate-instagram');
+
+      if (btnGenerateInstagram) {
+        btnGenerateInstagram.addEventListener('click', async () => {
+          const topicEl = document.getElementById('instagram-topic-input');
+          const topicValue = topicEl ? topicEl.value.trim() : '';
+          if (!topicValue) return;
+
+          setLoading(btnGenerateInstagram, true);
+          try {
+            const response = await fetch('http://localhost:8001/api/v1/content/instagram', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ topic: topicValue, style: 'engaging' })
+            });
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+
+            const capEl = document.getElementById('instagram-out-caption');
+            if (capEl && data.caption) {
+              capEl.innerHTML = data.caption.replace(/\n/g, '<br>');
+            }
+          } catch (e) {
+            const capEl = document.getElementById('instagram-out-caption');
+            if (capEl) capEl.textContent = 'API offline — configure backend for AI captions.';
+          } finally {
+            setLoading(btnGenerateInstagram, false);
+          }
+        });
+      }
+
+      // ─── Trend → Script shortcut ──────────────────────────────────────────
+      const btnTrendGenScript = document.getElementById('btn-trend-gen-script');
+      if (btnTrendGenScript) {
+        btnTrendGenScript.addEventListener('click', () => {
+          const trendTitleText = document.getElementById('trend-det-title');
+          const topicInput = document.getElementById('script-topic-input');
+          if (topicInput && trendTitleText) {
+            topicInput.value = trendTitleText.textContent;
+          }
+          // Switch to scripts panel
+          const scriptsMenuItem = document.querySelector('.menu-item[data-tab="scripts"]');
+          if (scriptsMenuItem) scriptsMenuItem.click();
+        });
+      }
+
     });
   </script>
 </body>

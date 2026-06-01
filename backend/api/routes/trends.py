@@ -1,49 +1,48 @@
-from fastapi import APIRouter
+import sys
+import os
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from services.track02_content.trend_service import TrendService
+
 router = APIRouter()
+service = TrendService()
+
 
 class DiscoverRequest(BaseModel):
-    category: str = "tech"
+    category: str = "all"
     limit: int = 10
+
 
 @router.post("/discover")
 async def discover_trends(request: DiscoverRequest):
-    # Standard mock trends returned from social signals
-    return [
-        {
-            "trend": "AI replacing Content Creators",
-            "category": "Tech",
-            "score": 94,
-            "growth_velocity": "+340%",
-            "sources": ["Reddit", "LinkedIn", "YouTube"]
-        },
-        {
-            "trend": "Micro-influencer ROI study",
-            "category": "Marketing",
-            "score": 88,
-            "growth_velocity": "+185%",
-            "sources": ["Twitter", "NewsAPI"]
-        },
-        {
-            "trend": "Reels vs TikTok 2026",
-            "category": "Social",
-            "score": 81,
-            "growth_velocity": "+120%",
-            "sources": ["Instagram", "TikTok"]
-        },
-        {
-            "trend": "Creator economy funding news",
-            "category": "Finance",
-            "score": 77,
-            "growth_velocity": "+95%",
-            "sources": ["NewsAPI", "Crunchbase"]
-        },
-        {
-            "trend": "Brand UGC strategy shift",
-            "category": "Brands",
-            "score": 73,
-            "growth_velocity": "+60%",
-            "sources": ["LinkedIn", "Twitter"]
-        }
-    ]
+    trends = await service.discover_trends(
+        category=request.category,
+        limit=request.limit,
+    )
+    return {"status": "success", "trends": trends, "count": len(trends)}
+
+
+@router.get("/categories")
+async def get_categories():
+    return {
+        "status": "success",
+        "categories": [
+            "Tech",
+            "Finance",
+            "Marketing",
+            "Social",
+            "Creator Economy",
+            "AI",
+        ],
+    }
+
+
+@router.get("/{trend_id}")
+async def get_trend_detail(trend_id: str):
+    detail = service.get_trend_detail(trend_id)
+    if "error" in detail:
+        raise HTTPException(status_code=404, detail=detail["error"])
+    return {"status": "success", "trend": detail}
