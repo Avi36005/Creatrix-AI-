@@ -53,10 +53,10 @@ body {
 }
 
 /* =============================================
-   HERO BACKGROUND — Quantix Reference Match
+   HERO BACKGROUND — Award-winning multi-layer aurora
    ============================================= */
 
-/* Layer 1 — Base: Dark navy top → light blue horizon bottom */
+/* Layer 1 — Base: near-black with multi-hue aurora system */
 .background-container {
   position: fixed;
   top: 0;
@@ -65,24 +65,63 @@ body {
   height: 100vh;
   z-index: 0;
   overflow: hidden;
-  background-color: #030a18;
+  /* Near-pure-black base — makes every glow pop */
+  background-color: #01050e;
   background-image:
-    /* Dark vignette overlay — keeps top corners very dark */
-    radial-gradient(ellipse 90% 55% at 50% 0%,
-      rgba(3, 10, 24, 0.96) 0%,
-      rgba(3, 10, 24, 0.55) 45%,
-      transparent 78%
+    /* Aurora 1 — violet/purple bloom, top-left: adds depth and hue variety */
+    radial-gradient(ellipse 58% 68% at -6% 20%,
+      rgba(110, 48, 235, 0.30) 0%,
+      rgba(80, 32, 185, 0.14) 42%,
+      transparent 68%
     ),
-    /* Main blue horizon glow — light source from bottom-center */
-    radial-gradient(ellipse 140% 90% at 50% 108%,
-      #5a92c8 0%,
-      #3a6898 15%,
-      #2a4e80 30%,
-      #1e3a6e 48%,
-      #0e2040 68%,
-      #071428 84%,
-      #030a18 100%
+    /* Aurora 2 — teal/cyan counter-accent, top-right: colour balance */
+    radial-gradient(ellipse 44% 52% at 110% 14%,
+      rgba(18, 185, 215, 0.18) 0%,
+      rgba(14, 118, 168, 0.08) 48%,
+      transparent 70%
+    ),
+    /* Vignette — crisp deep-black ceiling keeps text perfectly readable */
+    radial-gradient(ellipse 75% 52% at 50% 0%,
+      rgba(1, 5, 14, 0.98) 0%,
+      rgba(1, 5, 14, 0.72) 36%,
+      rgba(1, 5, 14, 0.22) 62%,
+      transparent 80%
+    ),
+    /* Primary horizon — rich blue light rising from below (main effect) */
+    radial-gradient(ellipse 158% 92% at 50% 114%,
+      #4e92cc 0%,
+      #2e6292 16%,
+      #1c3e74 33%,
+      #0c2250 52%,
+      #060c24 74%,
+      #01050e 100%
+    ),
+    /* Side darkening — frames the scene, prevents colour wash at edges */
+    linear-gradient(to right,
+      rgba(1, 5, 14, 0.62) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgba(1, 5, 14, 0.62) 100%
     );
+}
+
+/* Focused central spotlight — sharp blue beam at very bottom-center */
+.background-container::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 320px;
+  background: radial-gradient(ellipse 100% 100% at 50% 100%,
+    rgba(90, 168, 248, 0.42) 0%,
+    rgba(55, 118, 210, 0.16) 48%,
+    transparent 74%
+  );
+  filter: blur(28px);
+  z-index: 2;
+  pointer-events: none;
 }
 
 #canvas-3d {
@@ -101,73 +140,85 @@ body {
   mix-blend-mode: screen;
 }
 
-/* Layer 2a — LEFT CORNER glow */
+/* Layer 2a — LEFT glow: indigo-blue (slightly warmer) */
 .glow-bottom-left {
   display: block;
-  width: 680px;
-  height: 680px;
-  bottom: -160px;
-  left: -120px;
+  width: 820px;
+  height: 820px;
+  bottom: -240px;
+  left: -200px;
   background: radial-gradient(circle,
-    rgba(80, 150, 210, 0.50) 0%,
-    rgba(50, 100, 170, 0.22) 45%,
-    transparent 72%
+    rgba(75, 135, 240, 0.65) 0%,
+    rgba(55, 95, 210, 0.30) 36%,
+    rgba(35, 65, 160, 0.10) 60%,
+    transparent 76%
   );
-  filter: blur(56px);
+  filter: blur(72px);
 }
 
-/* Layer 2b — RIGHT CORNER glow */
+/* Layer 2b — RIGHT glow: cyan-blue (slightly cooler) */
 .glow-bottom-right {
   display: block;
-  width: 680px;
-  height: 680px;
-  bottom: -160px;
-  right: -120px;
+  width: 820px;
+  height: 820px;
+  bottom: -240px;
+  right: -200px;
   background: radial-gradient(circle,
-    rgba(80, 150, 210, 0.50) 0%,
-    rgba(50, 100, 170, 0.22) 45%,
-    transparent 72%
+    rgba(50, 165, 245, 0.60) 0%,
+    rgba(35, 120, 215, 0.27) 36%,
+    rgba(20, 80, 165, 0.09) 60%,
+    transparent 76%
   );
-  filter: blur(56px);
+  filter: blur(72px);
 }
 
-/* Layer 3 — Centre wave connecting both corner glows */
+/* Layer 3 — Wide horizon sweep: ties both corner glows together */
 .glow-center-wave {
   display: block;
   width: 100%;
-  height: 360px;
-  bottom: -80px;
+  height: 500px;
+  bottom: -130px;
   left: 0;
   border-radius: 0;
-  background: radial-gradient(ellipse 80% 100% at 50% 100%,
-    rgba(74, 140, 210, 0.30) 0%,
-    rgba(40, 80, 150, 0.12) 50%,
-    transparent 78%
+  background: radial-gradient(ellipse 82% 100% at 50% 100%,
+    rgba(58, 132, 228, 0.40) 0%,
+    rgba(38, 90, 178, 0.20) 42%,
+    rgba(20, 55, 125, 0.06) 70%,
+    transparent 84%
   );
-  filter: blur(40px);
+  filter: blur(50px);
 }
 
-/* Edge Lighting — subtle vertical framing */
+/* Edge Lighting — vertical framing with aurora tint */
 .edge-light-left {
   position: absolute;
-  top: 20%;
+  top: 10%;
   left: 0;
-  width: 12vw;
-  height: 80vh;
-  background: linear-gradient(to right, rgba(50, 120, 200, 0.07) 0%, transparent 100%);
+  width: 14vw;
+  height: 85vh;
+  background: linear-gradient(to right,
+    rgba(90, 60, 220, 0.10) 0%,
+    rgba(60, 120, 210, 0.05) 50%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
 .edge-light-right {
   position: absolute;
-  top: 20%;
+  top: 10%;
   right: 0;
-  width: 12vw;
-  height: 80vh;
-  background: linear-gradient(to left, rgba(50, 120, 200, 0.07) 0%, transparent 100%);
+  width: 14vw;
+  height: 85vh;
+  background: linear-gradient(to left,
+    rgba(20, 160, 220, 0.09) 0%,
+    rgba(40, 110, 200, 0.05) 50%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
+/* Film grain — essential for premium depth, prevents colour banding */
 .noise-overlay {
   position: absolute;
   top: 0;
@@ -175,46 +226,49 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.06;
   z-index: 2;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Layer 4 — Dot Matrix: visible in dark upper area, fade toward bright bottom */
+/* Dot matrix — constellation texture in the deep-dark upper zone */
 .halftone-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
   background-position: center top;
   opacity: 1;
-  /* Visible in upper area, fade out before the bright blue bottom */
   -webkit-mask-image: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.9) 0%,
-    rgba(0,0,0,0.75) 35%,
-    rgba(0,0,0,0.2) 65%,
-    transparent 85%
+    rgba(0,0,0,0.85) 0%,
+    rgba(0,0,0,0.70) 30%,
+    rgba(0,0,0,0.18) 62%,
+    transparent 82%
   );
   mask-image: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.9) 0%,
-    rgba(0,0,0,0.75) 35%,
-    rgba(0,0,0,0.2) 65%,
-    transparent 85%
+    rgba(0,0,0,0.85) 0%,
+    rgba(0,0,0,0.70) 30%,
+    rgba(0,0,0,0.18) 62%,
+    transparent 82%
   );
 }
 
-/* Linear bottom fade-to-white for seamless transition */
+/* Seamless transition to white content sections */
 .background-container::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 220px;
-  background: linear-gradient(to bottom, transparent, #ffffff);
+  height: 260px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(255,255,255,0.4) 55%,
+    #ffffff 100%
+  );
   z-index: 3;
   pointer-events: none;
 }
