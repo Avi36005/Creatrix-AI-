@@ -6,7 +6,7 @@
   <title>Creatrix AI — Creator Intelligence Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -162,7 +162,35 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
+
+    /* Track Toggle Pill */
+    .track-toggle {
+      display: flex;
+      background: var(--light-bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px;
+      gap: 2px;
+    }
+    .track-btn {
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+    .track-btn:hover { color: var(--text-dark); }
+    .track-btn.t-active-intel { background: var(--blue); color: #fff; box-shadow: 0 2px 10px rgba(79,142,247,0.30); }
+    .track-btn.t-active-creator { background: var(--purple); color: #fff; box-shadow: 0 2px 10px rgba(167,139,250,0.30); }
+    .track-btn.t-active-full { background: linear-gradient(90deg, var(--blue), var(--purple)); color: #fff; box-shadow: 0 2px 14px rgba(120,100,240,0.28); }
 
     .header-left h1 {
       font-family: var(--font-serif);
@@ -1232,7 +1260,12 @@
         <h1 id="dashboard-title">Overview Panel</h1>
         <p id="dashboard-subtitle">Real-time machine learning analytics and multi-agent workflow streams</p>
       </div>
-      <div class="header-right">
+      <div class="header-right" style="display:flex;align-items:center;gap:14px;">
+        <div class="track-toggle">
+          <button class="track-btn t-active-intel" id="toggle-intel" onclick="setActiveTrack('intel')">Influencer Intelligence</button>
+          <button class="track-btn" id="toggle-creator" onclick="setActiveTrack('creator')">Viral Creator</button>
+          <button class="track-btn" id="toggle-full" onclick="setActiveTrack('full')">Full Platform</button>
+        </div>
         <span class="date-badge" id="current-date">June 1, 2026</span>
       </div>
     </header>
@@ -1269,7 +1302,7 @@
         <!-- Creator Analysis Column -->
         <div class="white-card">
           <div class="panel-header">
-            <h2>Creator Analysis (Track 01)</h2>
+            <h2>Creator Intelligence Analysis</h2>
             <p>Perform an instant search evaluation on creator metrics and predicted benchmarks</p>
           </div>
           <div class="search-row">
@@ -1341,7 +1374,7 @@
         <!-- Terminal Output Stream Column -->
         <div class="white-card">
           <div class="panel-header">
-            <h2>Agent Workflow Stream (Track 02)</h2>
+            <h2>AI Agent Workflow Stream</h2>
             <p>Monitors backend multi-agent orchestration logs and viral script generation hooks</p>
           </div>
           
@@ -2659,6 +2692,26 @@
       }
 
       // ─── Loading state helper ─────────────────────────────────────────────
+      // --- TRACK TOGGLE ---
+      function setActiveTrack(track) {
+        const btns = { intel: 'toggle-intel', creator: 'toggle-creator', full: 'toggle-full' };
+        const classes = { intel: 't-active-intel', creator: 't-active-creator', full: 't-active-full' };
+        Object.values(btns).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('t-active-intel', 't-active-creator', 't-active-full');
+        });
+        const active = document.getElementById(btns[track]);
+        if (active) active.classList.add(classes[track]);
+
+        const subtitles = {
+          intel: 'Influencer intelligence, scoring and brand matching',
+          creator: 'Viral content creation, trends and script generation',
+          full: 'Complete AI-powered creator economy platform'
+        };
+        const sub = document.getElementById('dashboard-subtitle');
+        if (sub) sub.textContent = subtitles[track];
+      }
+
       function setLoading(btn, isLoading) {
         if (!btn) return;
         btn.disabled = isLoading;

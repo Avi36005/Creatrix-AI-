@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (i >= steps.length) {
         setTimeout(() => {
           overlay.style.opacity = '0';
-          setTimeout(() => window.location.href = 'tracks.html', 300);
+          setTimeout(() => window.location.href = 'dashboard.html', 300);
         }, 400);
         return;
       }
