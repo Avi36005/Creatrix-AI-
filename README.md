@@ -81,8 +81,9 @@ Beyond the unified platform (which solves the **Grand Challenge**), Track 1 and 
 | **Cloud Run service** | `creatrix-iq` | `creatrix-studio` |
 | **Source** | [`track1/`](track1/) | [`track2/`](track2/) |
 | **Core (per hackathon brief)** | Ratefluencer Score™, fake-follower detection, growth forecast, RAG brand matching — on **real YouTube data** | Live trend discovery + ranking, reel scripts, LinkedIn + Instagram content, AI images, virality prediction |
-| **⭐ Unique feature** | **Creator vs Creator** — analyze two creators live and compare Ratefluencer / Authenticity / Growth / Brand scores side-by-side | **One-Click Content Pack** — one topic → reel script + LinkedIn post + Instagram caption + virality score, generated in parallel |
-| **Inside app** | Track-focused dashboard (scoring · authenticity · growth · brand matcher) | Track-focused dashboard (trends · scripts · LinkedIn · Instagram · virality) |
+| **⭐ Flagship tool** | **Creator vs Creator** — analyze two creators live and compare Ratefluencer / Authenticity / Growth / Brand scores side-by-side | **One-Click Content Pack** — one topic → reel script + LinkedIn post + Instagram caption + virality score, generated in parallel |
+| **🆕 Signature tool** | **Rate Card** — turns real reach + engagement into a defensible sponsorship price per deliverable (post · story · reel · UGC · retainer) | **Hook Lab** — generates 6 scroll-stopping A/B opening hooks for any topic, one-click copy |
+| **Inside app** | Intelligence-themed dashboard — *Intelligence Lab · Analytics Core · Creator Signals* (Ratefluencer Score · Fraud Radar · Growth Forecast · Brand Fit · Rate Card) | Studio-themed dashboard — *Studio · Create · Insights* (Trend Radar · Reel Scripts · Reel Studio · Hook Lab · Virality Score) |
 
 Each landing page follows its own editorial design; the "inside" reuses the proven Creatrix dashboard filtered to that track. **All data is real** (YouTube Data API + Gemini / Groq / OpenAI / ElevenLabs) — no mocks. The three deployments are fully independent: editing one never affects the others.
 
@@ -133,7 +134,7 @@ Each landing page follows its own editorial design; the "inside" reuses the prov
 - **Keyless live trends** — Google News RSS + YouTube search, on-theme to the creator economy. No Reddit/News keys needed.
 
 ### 🔗 One Company, Synced Across Every Page
-Analyze a creator once and the **same real data flows into Scorer, Growth, Authenticity, and Brand Matcher** automatically — backed by a shared `CreatrixCompany` store (persisted in `localStorage`) and a persistent status banner.
+Analyze a creator once and the **same real data flows into Scorer, Growth, Authenticity, and Brand Matcher** automatically — backed by a shared `CreatrixCompany` store (persisted in `localStorage`) and a persistent status banner. The autonomous agent workstream and the dashboard both resolve metrics through a single shared `metrics_resolver` (live → sample → synthetic), so the **Ratefluencer Score is guaranteed identical on both** for any given creator + platform.
 
 ### 🧬 Real Machine-Learning Models
 | Model | Algorithm | Purpose | Output |
@@ -163,6 +164,7 @@ Every LLM call degrades gracefully instead of failing: **chat** uses Groq → Op
 | **Groq Llama 3.3 70B** | Reel script generation, trend ranking, in-app assistant chat |
 | **OpenAI GPT-4o-mini** | In-app assistant chat + universal fallback for chat & rich generation |
 | **OpenAI text-embedding-3-large** | Brand-matching embeddings (RAG) |
+| **OpenAI gpt-image-1** | Instagram post image generation (dall-e-3 fallback) |
 | **ElevenLabs Turbo v2** | Reel voiceover audio (real MP3) |
 | **YouTube Data API v3** | Real influencer metrics + live trend videos |
 | **Google News RSS** | Keyless real-time news trends |
@@ -303,6 +305,7 @@ Creatrix-AI-/
 │   │   ├── content.py · trends.py · virality.py · reports.py · agent.py
 │   │   ├── chat.py                          # in-app assistant chatbot (Groq → OpenAI)
 │   ├── services/
+│   │   ├── metrics_resolver.py              # shared live→sample→synthetic resolver (agent + dashboard score identically)
 │   │   ├── youtube_service.py               # ⭐ real YouTube channel data
 │   │   ├── instagram_service.py             # paid RapidAPI Instagram scraper
 │   │   ├── scraper_service.py               # live trends: Google News + YouTube + Reddit (keyless)
