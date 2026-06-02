@@ -1354,6 +1354,18 @@
       <span class="brand-name">Creatrix AI</span>
     </a>
 
+    <div class="nav-group-label">IQ Tools</div>
+    <ul class="sidebar-menu">
+      <li class="menu-item" data-tab="compare">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7 7"/><path d="M3 3l7 7"/><path d="M16 21h5v-5"/><path d="M8 21H3v-5"/><path d="M21 21l-7-7"/><path d="M3 21l7-7"/></svg>
+        <span>Compare Creators</span>
+      </li>
+      <li class="menu-item" data-tab="campaign">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+        <span>Campaign Predictor</span>
+      </li>
+    </ul>
+
     <div class="nav-group-label">Main</div>
     <ul class="sidebar-menu">
       <li class="menu-item active" data-tab="overview">
@@ -1439,6 +1451,46 @@
         <span class="date-badge" id="current-date">June 1, 2026</span>
       </div>
     </header>
+
+    <!-- ========================================== -->
+    <!-- PANEL: COMPARE CREATORS (IQ Tools)         -->
+    <!-- ========================================== -->
+    <div class="content-panel" id="panel-compare">
+      <div class="white-card">
+        <div class="panel-header">
+          <h2>Compare Creators</h2>
+          <p>Run two creators through the live intelligence engine and see who wins on every metric.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <input type="text" class="input-handle" id="cmp-handle-a" value="MrBeast" placeholder="Creator A (e.g. MrBeast)">
+          <input type="text" class="input-handle" id="cmp-handle-b" value="mkbhd" placeholder="Creator B (e.g. mkbhd)">
+        </div>
+        <button class="btn-action" id="btn-compare" data-original-text="Compare">Compare</button>
+        <div id="cmp-results" style="margin-top:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PANEL: CAMPAIGN PREDICTOR (IQ Tools)       -->
+    <!-- ========================================== -->
+    <div class="content-panel" id="panel-campaign">
+      <div class="white-card">
+        <div class="panel-header">
+          <h2>Campaign Predictor</h2>
+          <p>Estimate campaign success, reach and engaged audience for a creator in your brand category.</p>
+        </div>
+        <input type="text" class="input-handle" id="camp-handle" value="MrBeast" placeholder="Enter a creator (e.g. MrBeast)" style="margin-bottom:16px;">
+        <div id="camp-category-selector" class="platform-selector">
+          <div class="platform-pill active" data-category="Tech">Tech</div>
+          <div class="platform-pill" data-category="Gaming">Gaming</div>
+          <div class="platform-pill" data-category="Fashion">Fashion</div>
+          <div class="platform-pill" data-category="Finance">Finance</div>
+          <div class="platform-pill" data-category="Lifestyle">Lifestyle</div>
+        </div>
+        <button class="btn-action" id="btn-campaign" data-original-text="Predict Campaign Success">Predict Campaign Success</button>
+        <div id="camp-results" style="margin-top:24px;"></div>
+      </div>
+    </div>
 
     <!-- ========================================== -->
     <!-- PANEL 1: OVERVIEW TAB                      -->
@@ -3681,10 +3733,143 @@
     });
   </script>
   <script>
+  /* Creatrix IQ (Track 1) — IQ Tools: Compare Creators + Campaign Predictor. */
+  (function () {
+    function api() { return (window.API_BASE || 'http://localhost:8080'); }
+    function fmt(n) {
+      n = Number(n) || 0;
+      if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+      return String(Math.round(n));
+    }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function liveBadge(isReal) {
+      return isReal
+        ? '<span class="badge badge-success" style="margin-left:8px;">LIVE</span>'
+        : '<span class="badge badge-warning" style="margin-left:8px;">ESTIMATED</span>';
+    }
+    function analyze(handle) {
+      return fetch(api() + '/api/v1/influencer/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle: handle, platform: 'youtube' })
+      }).then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); });
+    }
+
+    // ── Compare Creators ─────────────────────────────────────────────────
+    function initCompare() {
+      var btn = document.getElementById('btn-compare');
+      var out = document.getElementById('cmp-results');
+      if (!btn || !out) return;
+      btn.addEventListener('click', function () {
+        var a = (document.getElementById('cmp-handle-a').value || '').trim();
+        var b = (document.getElementById('cmp-handle-b').value || '').trim();
+        if (!a || !b) { out.innerHTML = '<p style="color:var(--red);">Enter two creator handles to compare.</p>'; return; }
+        out.innerHTML = '<p style="color:var(--text-muted);">Analyzing both creators…</p>';
+        btn.disabled = true;
+        Promise.all([analyze(a), analyze(b)]).then(function (res) {
+          renderCompare(out, res[0], res[1]);
+        }).catch(function (err) {
+          out.innerHTML = '<p style="color:var(--red);">Could not compare creators: ' + (err && err.message ? err.message : 'request failed') + '.</p>';
+        }).then(function () { btn.disabled = false; });
+      });
+    }
+    function renderCompare(out, da, db) {
+      da = da || {}; db = db || {};
+      var sa = da.scores || {}, sb = db.scores || {};
+      var ma = da.metrics || {}, mb = db.metrics || {};
+      var nameA = da.handle || 'Creator A', nameB = db.handle || 'Creator B';
+      var rows = [
+        { label: 'Followers', a: Number(ma.followers) || 0, b: Number(mb.followers) || 0, fmt: fmt },
+        { label: 'Ratefluencer Score', a: Number(sa.ratefluencer_score) || 0, b: Number(sb.ratefluencer_score) || 0 },
+        { label: 'Authenticity Score', a: Number(sa.authenticity_score) || 0, b: Number(sb.authenticity_score) || 0 },
+        { label: 'Growth Score', a: Number(sa.growth_score) || 0, b: Number(sb.growth_score) || 0 },
+        { label: 'Brand Score', a: Number(sa.brand_score) || 0, b: Number(sb.brand_score) || 0 }
+      ];
+      function cell(val, win, fmtFn) {
+        var txt = fmtFn ? fmtFn(val) : String(val);
+        return '<td style="text-align:center;' + (win ? 'font-weight:700;color:var(--blue);' : '') + '">' + txt + '</td>';
+      }
+      var body = rows.map(function (r) {
+        var aWin = r.a > r.b, bWin = r.b > r.a;
+        return '<tr><td style="font-weight:600;">' + r.label + '</td>' +
+          cell(r.a, aWin, r.fmt) + cell(r.b, bWin, r.fmt) + '</tr>';
+      }).join('');
+      out.innerHTML =
+        '<div class="table-container"><table>' +
+          '<thead><tr><th>Metric</th>' +
+            '<th style="text-align:center;">' + nameA + liveBadge(!!da.is_real) + '</th>' +
+            '<th style="text-align:center;">' + nameB + liveBadge(!!db.is_real) + '</th>' +
+          '</tr></thead><tbody>' + body + '</tbody></table></div>';
+    }
+
+    // ── Campaign Predictor ───────────────────────────────────────────────
+    function initCampaign() {
+      var btn = document.getElementById('btn-campaign');
+      var out = document.getElementById('camp-results');
+      var sel = document.getElementById('camp-category-selector');
+      if (!btn || !out) return;
+      if (sel) {
+        sel.addEventListener('click', function (e) {
+          var pill = e.target.closest('.platform-pill');
+          if (!pill) return;
+          sel.querySelectorAll('.platform-pill').forEach(function (p) { p.classList.remove('active'); });
+          pill.classList.add('active');
+        });
+      }
+      btn.addEventListener('click', function () {
+        var handle = (document.getElementById('camp-handle').value || '').trim();
+        if (!handle) { out.innerHTML = '<p style="color:var(--red);">Enter a creator to predict campaign success.</p>'; return; }
+        var activePill = sel ? sel.querySelector('.platform-pill.active') : null;
+        var category = activePill ? (activePill.getAttribute('data-category') || 'Tech') : 'Tech';
+        out.innerHTML = '<p style="color:var(--text-muted);">Predicting campaign success…</p>';
+        btn.disabled = true;
+        analyze(handle).then(function (d) {
+          renderCampaign(out, d, category);
+        }).catch(function (err) {
+          out.innerHTML = '<p style="color:var(--red);">Could not predict campaign: ' + (err && err.message ? err.message : 'request failed') + '.</p>';
+        }).then(function () { btn.disabled = false; });
+      });
+    }
+    function renderCampaign(out, d, category) {
+      d = d || {};
+      var s = d.scores || {}, m = d.metrics || {};
+      var rate = Number(s.ratefluencer_score) || 0;
+      var auth = Number(s.authenticity_score) || 0;
+      var eng = (s.engagement_score != null) ? Number(s.engagement_score) : 50;
+      var followers = Number(m.followers) || 0;
+      var engRate = Number(m.engagement_rate) || 0;
+      var prob = clamp(Math.round(0.5 * rate + 0.3 * auth + 0.2 * eng), 1, 99);
+      var engaged = Math.round(followers * engRate / 100);
+      var rec, recColor;
+      if (prob >= 75) { rec = 'Strong fit — greenlight'; recColor = 'var(--green)'; }
+      else if (prob >= 55) { rec = 'Good fit — negotiate rate'; recColor = 'var(--blue)'; }
+      else { rec = 'Higher risk — pilot first'; recColor = 'var(--amber)'; }
+      out.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">' +
+          '<span style="font-weight:600;">' + (d.handle || 'Creator') + '</span>' +
+          '<span class="badge badge-info">' + category + '</span>' + liveBadge(!!d.is_real) +
+        '</div>' +
+        '<div style="text-align:center;margin-bottom:24px;">' +
+          '<div style="font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:1px;">Campaign Success Probability</div>' +
+          '<div style="font-size:64px;font-weight:800;color:' + recColor + ';line-height:1.1;">' + prob + '%</div>' +
+          '<div style="font-size:14px;font-weight:600;color:' + recColor + ';">' + rec + '</div>' +
+        '</div>' +
+        '<div class="score-cards-grid" style="grid-template-columns:repeat(2,1fr);">' +
+          '<div class="sub-score-card"><div class="sub-score-label">Estimated Reach</div><div class="sub-score-val color-blue">' + fmt(followers) + '</div></div>' +
+          '<div class="sub-score-card"><div class="sub-score-label">Engaged Audience</div><div class="sub-score-val color-purple">' + fmt(engaged) + '</div></div>' +
+        '</div>';
+    }
+
+    window.addEventListener('load', function () { initCompare(); initCampaign(); });
+  })();
+  </script>
+  <script>
   /* Creatrix IQ (Track 1) — show only Influencer-Intelligence tabs + rebrand. */
   (function () {
-    var SHOW = ['overview','scorer','predictor','authenticity','matcher','reports','library','settings'];
-    var DEFAULT_TAB = 'overview';
+    var SHOW = ['compare','campaign','overview','scorer','predictor','authenticity','matcher','reports','library','settings'];
+    var DEFAULT_TAB = 'compare';
     var BRAND = 'Creatrix IQ';
     function apply() {
       document.querySelectorAll('.menu-item[data-tab]').forEach(function (li) {
@@ -3701,5 +3886,13 @@
     window.addEventListener('load', function () { setTimeout(apply, 200); });
   })();
   </script>
+  <style id="cx-iq-theme">
+    /* Creatrix IQ — indigo "intelligence" accent, distinct from the full platform's sky-blue. */
+    :root { --blue: #4F46E5; --blue-deep: #4338CA; --blue-soft: #EEF1FF; }
+    .brand-name { color: #4F46E5 !important; }
+    .nav-group-label { color: #6366F1 !important; letter-spacing: .14em; }
+    .sidebar-menu .menu-item.active { box-shadow: inset 3px 0 0 #4F46E5; }
+    .sidebar { background: linear-gradient(180deg, #f7f8ff 0%, #ffffff 60%); }
+  </style>
 </body>
 </html>

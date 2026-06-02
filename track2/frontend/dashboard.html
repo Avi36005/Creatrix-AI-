@@ -1354,6 +1354,18 @@
       <span class="brand-name">Creatrix AI</span>
     </a>
 
+    <div class="nav-group-label">Studio Tools</div>
+    <ul class="sidebar-menu">
+      <li class="menu-item" data-tab="radar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Trend Radar</span>
+      </li>
+      <li class="menu-item" data-tab="pack">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>Content Pack</span>
+      </li>
+    </ul>
+
     <div class="nav-group-label">Main</div>
     <ul class="sidebar-menu">
       <li class="menu-item active" data-tab="overview">
@@ -1439,6 +1451,61 @@
         <span class="date-badge" id="current-date">June 1, 2026</span>
       </div>
     </header>
+
+    <!-- ========================================== -->
+    <!-- PANEL: TREND RADAR (Studio Tools)          -->
+    <!-- ========================================== -->
+    <div class="content-panel" id="panel-radar">
+      <div class="white-card">
+        <div class="panel-header">
+          <h2>Trend Radar</h2>
+          <p>Scan live viral trends across categories and turn any one of them into a content pack.</p>
+        </div>
+        <div class="platform-selector" id="radar-categories">
+          <span class="platform-pill active" data-cat="all">All</span>
+          <span class="platform-pill" data-cat="ai">AI</span>
+          <span class="platform-pill" data-cat="tech">Tech</span>
+          <span class="platform-pill" data-cat="business">Business</span>
+          <span class="platform-pill" data-cat="creator economy">Creator Economy</span>
+        </div>
+        <button class="btn-action" id="btn-radar-scan">Scan Live Trends</button>
+        <div id="radar-results" style="margin-top:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PANEL: CONTENT PACK (Studio Tools)         -->
+    <!-- ========================================== -->
+    <div class="content-panel" id="panel-pack">
+      <div class="white-card">
+        <div class="panel-header">
+          <h2>Content Pack</h2>
+          <p>Generate a full cross-platform content kit — script, LinkedIn post, Instagram caption, and a virality forecast — from one topic.</p>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" class="input-handle" id="pack-topic" value="AI tools for creators" placeholder="Enter a topic (e.g. AI tools for creators)">
+        </div>
+        <button class="btn-action" id="btn-pack-generate">Generate Pack</button>
+        <div class="two-col-equal" style="margin-top:24px;">
+          <div class="white-card" style="margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:16px;"><h2 style="font-size:18px;">Script</h2><p>Hook · Story · Insight · CTA</p></div>
+            <div id="pack-script-body"><span style="color:var(--text-faint);font-size:13px;">No script yet.</span></div>
+          </div>
+          <div class="white-card" style="margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:16px;"><h2 style="font-size:18px;">LinkedIn Post</h2><p>Thought-leadership for creators</p></div>
+            <div id="pack-linkedin-body"><span style="color:var(--text-faint);font-size:13px;">No post yet.</span></div>
+          </div>
+          <div class="white-card" style="margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:16px;"><h2 style="font-size:18px;">Instagram Caption</h2><p>Engaging caption + hashtags</p></div>
+            <div id="pack-instagram-body"><span style="color:var(--text-faint);font-size:13px;">No caption yet.</span></div>
+          </div>
+          <div class="white-card" style="margin-bottom:0;">
+            <div class="panel-header" style="margin-bottom:16px;"><h2 style="font-size:18px;">Virality Forecast</h2><p>Predicted score for Instagram</p></div>
+            <div id="pack-virality-body"><span style="color:var(--text-faint);font-size:13px;">No forecast yet.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ========================================== -->
     <!-- PANEL 1: OVERVIEW TAB                      -->
@@ -2618,6 +2685,8 @@
       const headerSubtitle = document.getElementById('dashboard-subtitle');
 
       const tabTitles = {
+        radar: { title: "Trend Radar", sub: "Scan live viral trends across categories and spin up content" },
+        pack: { title: "Content Pack", sub: "Generate a full cross-platform content kit from one topic" },
         overview: { title: "Overview Panel", sub: "Real-time machine learning analytics and multi-agent workflow streams" },
         scorer: { title: "Influencer Scorer", sub: "Verify follower authenticity, engagement patterns, and master Ratefluencer Score™" },
         predictor: { title: "Growth Predictor", sub: "Forecasting creator follower milestones and reach curves" },
@@ -3681,10 +3750,186 @@
     });
   </script>
   <script>
+  /* Creatrix Studio (Track 2) — Studio Tools: Trend Radar + Content Pack wiring. */
+  (function () {
+    function fmtNum(n) {
+      n = Number(n);
+      if (!isFinite(n)) return '0';
+      if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+      if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+      return String(Math.round(n * 10) / 10);
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function api() { return (window.API_BASE || '').replace(/\/$/, ''); }
+    async function postJSON(path, body) {
+      var res = await fetch(api() + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+
+    function wireRadar() {
+      var pills = document.querySelectorAll('#radar-categories .platform-pill');
+      var scanBtn = document.getElementById('btn-radar-scan');
+      var results = document.getElementById('radar-results');
+      if (!scanBtn || !results) return;
+
+      pills.forEach(function (p) {
+        p.addEventListener('click', function () {
+          pills.forEach(function (x) { x.classList.remove('active'); });
+          p.classList.add('active');
+        });
+      });
+
+      function activeCat() {
+        var act = document.querySelector('#radar-categories .platform-pill.active');
+        var c = act ? (act.getAttribute('data-cat') || 'all') : 'all';
+        return c.toLowerCase();
+      }
+
+      scanBtn.addEventListener('click', async function () {
+        results.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">Scanning live trends…</p>';
+        try {
+          var data = await postJSON('/api/v1/trends/discover', { category: activeCat(), limit: 8 });
+          var trends = (data && data.trends) || [];
+          if (!trends.length) {
+            results.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">No trends found. Try another category.</p>';
+            return;
+          }
+          var live = data && data.is_live
+            ? '<span class="badge badge-success" style="margin-bottom:14px;display:inline-block;">● LIVE</span>'
+            : '';
+          var cards = trends.map(function (t, i) {
+            var sources = (t.sources || []).map(function (s) {
+              return '<span class="source-mini-tag">' + esc(s) + '</span>';
+            }).join('');
+            return '' +
+              '<div class="sub-score-card" style="text-align:left;margin-bottom:12px;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">' +
+                  '<div style="flex:1;">' +
+                    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+                      '<span style="font-weight:700;color:var(--blue);">#' + (i + 1) + '</span>' +
+                      '<span style="font-weight:600;font-size:15px;color:var(--text-dark);">' + esc(t.title) + '</span>' +
+                      '<span class="badge badge-info" style="font-size:10px;padding:2px 8px;">' + esc(t.category || 'general') + '</span>' +
+                    '</div>' +
+                    '<div class="trend-sources-pills" style="margin-top:6px;">' + sources + '</div>' +
+                  '</div>' +
+                  '<div style="text-align:right;min-width:90px;">' +
+                    '<div class="sub-score-val" style="font-size:22px;">' + esc(t.score != null ? t.score : '—') + '</div>' +
+                    '<div style="font-size:11px;color:var(--green);font-weight:600;">▲ ' + fmtNum(t.growth_velocity || 0) + '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<button class="btn-action use-trend-btn" data-title="' + esc(t.title) + '" style="margin-top:12px;padding:8px 18px;font-size:13px;">Use this trend</button>' +
+              '</div>';
+          }).join('');
+          results.innerHTML = live + cards;
+
+          results.querySelectorAll('.use-trend-btn').forEach(function (b) {
+            b.addEventListener('click', function () {
+              var topic = b.getAttribute('data-title') || '';
+              var topicInput = document.getElementById('pack-topic');
+              if (topicInput) topicInput.value = topic;
+              var packItem = document.querySelector('.menu-item[data-tab="pack"]');
+              if (packItem) packItem.click();
+            });
+          });
+        } catch (err) {
+          results.innerHTML = '<p style="color:var(--red);font-size:14px;">Could not load trends right now. Please try again.</p>';
+        }
+      });
+    }
+
+    function wirePack() {
+      var genBtn = document.getElementById('btn-pack-generate');
+      var topicInput = document.getElementById('pack-topic');
+      if (!genBtn || !topicInput) return;
+
+      var scriptBody = document.getElementById('pack-script-body');
+      var liBody = document.getElementById('pack-linkedin-body');
+      var igBody = document.getElementById('pack-instagram-body');
+      var vBody = document.getElementById('pack-virality-body');
+
+      function loading(el) {
+        if (el) el.innerHTML = '<span style="color:var(--text-muted);font-size:13px;">Generating…</span>';
+      }
+      function failed(el) {
+        if (el) el.innerHTML = '<span style="color:var(--red);font-size:13px;">Could not generate. Try again.</span>';
+      }
+      function block(label, color, text) {
+        return '<div class="script-block" style="background:var(--light-bg);">' +
+          '<span class="script-block-pill" style="background:' + color + '22;color:' + color + ';">' + esc(label) + '</span>' +
+          '<span class="script-block-text">' + esc(text || '') + '</span></div>';
+      }
+      function tags(arr) {
+        if (!arr || !arr.length) return '';
+        return '<div class="trend-sources-pills" style="margin-top:10px;">' +
+          arr.map(function (h) {
+            var t = String(h); if (t[0] !== '#') t = '#' + t.replace(/^#/, '');
+            return '<span class="source-mini-tag">' + esc(t) + '</span>';
+          }).join('') + '</div>';
+      }
+
+      genBtn.addEventListener('click', function () {
+        var topic = (topicInput.value || '').trim() || 'AI tools for creators';
+        loading(scriptBody); loading(liBody); loading(igBody); loading(vBody);
+
+        postJSON('/api/v1/content/generate-script', { topic: topic, duration: 30, style: 'hooks' })
+          .then(function (d) {
+            if (!scriptBody) return;
+            scriptBody.innerHTML =
+              block('Hook', '#3B82F6', d.hook) +
+              block('Story', '#A78BFA', d.story) +
+              block('Insight', '#3DD68C', d.insight) +
+              block('CTA', '#F5A623', d.cta);
+          }).catch(function () { failed(scriptBody); });
+
+        postJSON('/api/v1/content/linkedin', { topic: topic, audience: 'creators' })
+          .then(function (d) {
+            if (!liBody) return;
+            liBody.innerHTML =
+              '<p style="font-size:14px;line-height:1.6;white-space:pre-wrap;color:var(--text-dark);">' +
+              esc(d.post_text || '') + '</p>' + tags(d.hashtags);
+          }).catch(function () { failed(liBody); });
+
+        postJSON('/api/v1/content/instagram', { topic: topic, style: 'engaging' })
+          .then(function (d) {
+            if (!igBody) return;
+            igBody.innerHTML =
+              '<p style="font-size:14px;line-height:1.6;white-space:pre-wrap;color:var(--text-dark);">' +
+              esc(d.caption || '') + '</p>' + tags(d.hashtags);
+          }).catch(function () { failed(igBody); });
+
+        postJSON('/api/v1/virality/predict', { script_text: topic, platform: 'instagram' })
+          .then(function (d) {
+            if (!vBody) return;
+            vBody.innerHTML =
+              '<div style="display:flex;align-items:baseline;gap:12px;">' +
+                '<span class="sub-score-val" style="font-size:40px;color:var(--blue);">' + esc(d.virality_score != null ? d.virality_score : '—') + '</span>' +
+                '<span class="badge badge-info" style="font-size:14px;">' + esc(d.grade || '') + '</span>' +
+              '</div>';
+          }).catch(function () { failed(vBody); });
+      });
+    }
+
+    window.addEventListener('load', function () {
+      wireRadar();
+      wirePack();
+    });
+  })();
+  </script>
+  <script>
   /* Creatrix Studio (Track 2) — show only Viral-Content tabs + rebrand. */
   (function () {
-    var SHOW = ['trends','scripts','reelbuilder','linkedin','instagram','virality','reports','library','settings'];
-    var DEFAULT_TAB = 'trends';
+    var SHOW = ['radar','pack','trends','scripts','reelbuilder','linkedin','instagram','virality','reports','library','settings'];
+    var DEFAULT_TAB = 'radar';
     var BRAND = 'Creatrix Studio';
     function apply() {
       document.querySelectorAll('.menu-item[data-tab]').forEach(function (li) {
@@ -3701,5 +3946,13 @@
     window.addEventListener('load', function () { setTimeout(apply, 200); });
   })();
   </script>
+  <style id="cx-studio-theme">
+    /* Creatrix Studio — violet/fuchsia "creative" accent, distinct from the full platform. */
+    :root { --blue: #9333EA; --blue-deep: #7E22CE; --blue-soft: #F7EFFF; }
+    .brand-name { color: #9333EA !important; }
+    .nav-group-label { color: #A855F7 !important; letter-spacing: .14em; }
+    .sidebar-menu .menu-item.active { box-shadow: inset 3px 0 0 #9333EA; }
+    .sidebar { background: linear-gradient(180deg, #fdf6ff 0%, #ffffff 60%); }
+  </style>
 </body>
 </html>
