@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from services.track01_intelligence.ratefluencer_score import RatefluencerScoringEngine
 from services.track02_content.script_generator import ScriptGenerator
 from services.ai_providers.gemini_client import GeminiClient
+from services.metrics_resolver import resolve_metrics
 
 # ── Optional LangGraph import ────────────────────────────────────────────────
 try:
@@ -30,48 +31,6 @@ try:
 except ImportError:
     _LANGGRAPH_AVAILABLE = False
     AgentState = dict  # type: ignore
-
-
-_SAMPLE_DATA = {
-    "ankita": {
-        "followers": 2400000, "engagement_rate": 6.8, "avg_likes": 87000,
-        "avg_comments": 4200, "post_frequency": 4.2, "avg_views": 180000,
-        "niche": "fashion",
-    },
-    "rohit": {
-        "followers": 780000, "engagement_rate": 4.9, "avg_likes": 38000,
-        "avg_comments": 1800, "post_frequency": 3.5, "avg_views": 60000,
-        "niche": "tech",
-    },
-    "priya": {
-        "followers": 120000, "engagement_rate": 3.8, "avg_likes": 4500,
-        "avg_comments": 320, "post_frequency": 2.0, "avg_views": 15000,
-        "niche": "wellness",
-    },
-}
-
-
-def _get_metrics_for_handle(handle: str) -> dict:
-    clean = handle.lower().lstrip("@")
-    for key, data in _SAMPLE_DATA.items():
-        if key in clean:
-            return {**data, "handle": handle}
-    # Synthetic fallback using handle hash
-    import hashlib
-    seed = int(hashlib.md5(handle.encode()).hexdigest(), 16)
-    followers = 50000 + (seed % 450000)
-    eng = 2.0 + (seed % 50) / 10.0
-    likes = int(followers * eng / 100)
-    return {
-        "handle": handle,
-        "followers": followers,
-        "engagement_rate": round(eng, 1),
-        "avg_likes": likes,
-        "avg_comments": int(likes * 0.05),
-        "post_frequency": 1.5 + (seed % 5) * 0.5,
-        "avg_views": likes * 3,
-        "niche": "general",
-    }
 
 
 class ViraNovaAgent:
@@ -102,10 +61,17 @@ class ViraNovaAgent:
         }
 
         # ── Step 1: data_scout ───────────────────────────────────────────
+        # Resolve metrics through the SAME shared resolver the /analyze
+        # dashboard uses, so the Ratefluencer Score the agent streams is
+        # identical to the score shown on the dashboard for this handle.
         await asyncio.sleep(0.3)
-        metrics = _get_metrics_for_handle(handle)
+        metrics = await resolve_metrics(handle, platform)
         state["influencer_data"] = metrics
-        msg1 = f"Scouting data for {handle} on {platform}. Found {metrics['followers']:,} followers."
+        source = "live" if metrics.get("is_real") else "sample"
+        msg1 = (
+            f"Scouting {source} data for {handle} on {platform}. "
+            f"Found {metrics['followers']:,} followers."
+        )
         logs.append(msg1)
         yield _sse(
             step="data_scout",

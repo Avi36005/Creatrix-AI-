@@ -2964,7 +2964,7 @@
             const response = await fetch(`${window.API_BASE||'http://localhost:8080'}/api/v1/agent/run`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ input: handle, task: 'full_analysis', platform: 'instagram' })
+              body: JSON.stringify({ input: handle, task: 'full_analysis', platform: activeTrackPlatform() })
             });
 
             if (!response.ok) throw new Error('API server unreachable');

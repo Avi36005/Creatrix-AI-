@@ -45,7 +45,8 @@ class OpenAIChatClient:
         Generate an image with OpenAI and return it as base64 PNG (no data URI
         prefix), or '' on failure. Tries gpt-image-1 first (newest), then falls
         back to dall-e-3 — so it works whether or not the account is verified
-        for gpt-image-1.
+        for gpt-image-1. gpt-image-1 always returns b64_json; dall-e-3 returns a
+        URL, which we fetch and base64-encode so callers get one consistent type.
         """
         if not settings.OPENAI_API_KEY:
             return ""
@@ -56,8 +57,7 @@ class OpenAIChatClient:
         }
         attempts = [
             {"model": "gpt-image-1", "prompt": prompt[:1000], "size": size, "n": 1},
-            {"model": "dall-e-3", "prompt": prompt[:1000], "size": "1024x1024",
-             "n": 1, "response_format": "b64_json"},
+            {"model": "dall-e-3", "prompt": prompt[:1000], "size": "1024x1024", "n": 1},
         ]
 
         try:
@@ -75,6 +75,13 @@ class OpenAIChatClient:
                         b64 = item.get("b64_json")
                         if b64:
                             return b64
+                        # dall-e-3 returns a hosted URL — fetch it and encode.
+                        url = item.get("url")
+                        if url:
+                            img = await client.get(url)
+                            if img.status_code == 200:
+                                import base64
+                                return base64.b64encode(img.content).decode("utf-8")
                     except Exception:
                         continue
         except Exception:

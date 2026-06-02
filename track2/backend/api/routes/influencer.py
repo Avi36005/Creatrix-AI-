@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from services.track01_intelligence.ratefluencer_score import RatefluencerScoringEngine
 from services.ai_providers.gemini_client import GeminiClient
 from services import youtube_service, instagram_service
+from services.metrics_resolver import resolve_metrics
 
 router = APIRouter()
 engine = RatefluencerScoringEngine()
@@ -144,44 +145,11 @@ async def analyze_influencer(request: AnalyzeRequest):
     if not request.handle:
         raise HTTPException(status_code=400, detail="Handle is required")
 
-    # 1) Prefer REAL live data (YouTube free / Instagram paid).
-    data_source = "live"
-    real = await _real_metrics(request.handle, request.platform)
-    if real:
-        metrics = real
-        niche = real["niche"]
-        data_source = real["source"]
-    else:
-        # 2) Fall back to curated sample data, then synthetic.
-        stored = _find_influencer(request.handle)
-        if stored:
-            details = stored.get("details", {})
-            followers = _parse_followers(details.get("followers", 100000))
-            eng = _parse_percent(details.get("engagement_rate", 3.0))
-            avg_views_raw = details.get("avg_views", 25000)
-            avg_views = _parse_followers(avg_views_raw)
-            post_freq = _parse_percent(
-                str(details.get("post_frequency", "3.0/wk")).split("/")[0]
-            )
-            avg_likes = int(followers * eng / 100)
-            avg_comments = int(avg_likes * 0.05)
-            niche = _infer_niche(stored.get("handle", ""))
-
-            metrics = {
-                "handle": request.handle,
-                "followers": followers,
-                "engagement_rate": eng,
-                "avg_likes": avg_likes,
-                "avg_comments": avg_comments,
-                "post_frequency": post_freq,
-                "avg_views": avg_views,
-                "niche": niche,
-            }
-            data_source = "sample"
-        else:
-            metrics = _synthetic_metrics(request.handle)
-            niche = metrics["niche"]
-            data_source = "estimated"
+    # Resolve metrics through the SHARED resolver (live → sample → synthetic)
+    # so the dashboard score is identical to the ViraNova agent workstream.
+    metrics = await resolve_metrics(request.handle, request.platform)
+    niche = metrics["niche"]
+    data_source = metrics["data_source"]
 
     scores = engine.calculate_score(metrics)
     brands = engine.get_brand_matches(niche, scores)
@@ -212,7 +180,7 @@ async def analyze_influencer(request: AnalyzeRequest):
         "platform": request.platform,
         "niche": niche,
         "data_source": data_source,
-        "is_real": data_source in ("youtube", "instagram", "live"),
+        "is_real": metrics.get("is_real", data_source in ("youtube", "instagram", "live")),
         "metrics": {
             "followers": metrics["followers"],
             "engagement_rate": metrics["engagement_rate"],
