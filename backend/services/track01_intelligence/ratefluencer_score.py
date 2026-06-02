@@ -112,15 +112,20 @@ class RatefluencerScoringEngine:
         )
         monthly_growth_rate = min(0.25, monthly_growth_rate)
 
+        # Always project at least 12 months so 3m/6m/12m are all available,
+        # regardless of the requested horizon.
+        horizon = max(months, 12)
         curve = [followers]
         current = followers
-        for _ in range(months):
+        for _ in range(horizon):
             current = int(current * (1 + monthly_growth_rate))
             curve.append(current)
 
         projected_3m = curve[3]
         projected_6m = curve[6]
-        projected_12m = curve[12] if months >= 12 else curve[-1]
+        projected_12m = curve[12]
+        # The visible curve respects the requested horizon.
+        curve = curve[: months + 1]
 
         return {
             "current": followers,

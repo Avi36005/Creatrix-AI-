@@ -2744,7 +2744,7 @@
         }
 
         // ── Growth panel ──────────────────────────────────────────────────
-        const cards = document.querySelectorAll('#panel-growth .sub-score-val');
+        const cards = document.querySelectorAll('#panel-predictor .sub-score-val');
         if (cards[0]) cards[0].textContent = formatNumber(growth.current || mt.followers || 0);
         if (cards[1]) cards[1].textContent = formatNumber(growth.projected_6m || 0);
         if (cards[2]) cards[2].textContent = '+' + (growth.monthly_rate || 0) + '%/mo';
@@ -3540,7 +3540,7 @@
         btnPredictGrowth.addEventListener('click', async () => {
           const handleEl = document.getElementById('pred-handle');
           const handle = handleEl ? handleEl.value.trim() : 'MrBeast';
-          const activePill = document.querySelector('#panel-growth .platform-pill.active');
+          const activePill = document.querySelector('#panel-predictor .platform-pill.active');
           const horizonText = activePill ? activePill.textContent.trim() : '6 Months';
           const months = horizonText.includes('12') ? 12 : horizonText.includes('3') ? 3 : 6;
 
@@ -3555,7 +3555,7 @@
             if (!res.ok) throw new Error('API error');
             const d = await res.json();
             const g = d.growth || {};
-            const cards = document.querySelectorAll('#panel-growth .sub-score-val');
+            const cards = document.querySelectorAll('#panel-predictor .sub-score-val');
             if (cards[0]) cards[0].textContent = formatNumber(g.current || 0);
             if (cards[1]) {
               const pred = months === 3 ? g.projected_3m : months === 12 ? g.projected_12m : g.projected_6m;

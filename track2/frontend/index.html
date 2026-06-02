@@ -268,6 +268,109 @@
     .caps-cta { display: flex; justify-content: center; margin-top: 54px; }
 
     /* ════════════════════════════════════════════════════════════════
+       TREND RADAR (live trend discovery + ranking)
+       ════════════════════════════════════════════════════════════════ */
+    .radar { position: relative; z-index: 1; padding: 90px 0; border-top: 1px solid var(--line); background: var(--paper-2); }
+    .radar-eyebrow {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--steel); margin-bottom: 18px;
+    }
+    .radar-eyebrow::before { content: ''; width: 26px; height: 1.5px; background: var(--steel); opacity: 0.6; }
+    .radar-title {
+      font-family: var(--font-display); font-weight: 500;
+      font-size: clamp(2.1rem, 4.4vw, 3.2rem); line-height: 1.1; letter-spacing: -0.015em;
+      margin-bottom: 14px; color: var(--ink);
+    }
+    .radar-title i { font-style: italic; color: var(--steel); }
+    .radar-desc { color: var(--ink-soft); max-width: 560px; font-size: 1.02rem; line-height: 1.6; margin-bottom: 32px; }
+
+    .radar-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .radar-cats { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radar-cat {
+      font-family: var(--font-sans); font-size: 0.86rem; font-weight: 500;
+      padding: 9px 16px; border-radius: 100px; cursor: pointer;
+      background: rgba(20,23,31,0.04); color: var(--ink-soft); border: 1px solid var(--line);
+      transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.2s;
+    }
+    .radar-cat:hover { transform: translateY(-1px); border-color: var(--steel); }
+    .radar-cat.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .radar-btn {
+      background: var(--ink); color: var(--paper); border: none; border-radius: 12px;
+      padding: 13px 26px; font-family: var(--font-sans); font-weight: 600; font-size: 0.94rem;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+      transition: transform 0.25s, box-shadow 0.25s, opacity 0.25s;
+      box-shadow: 0 8px 22px rgba(20,23,31,0.18);
+    }
+    .radar-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(20,23,31,0.26); }
+    .radar-btn:disabled { opacity: 0.7; cursor: wait; transform: none; }
+    .radar-btn svg { width: 15px; height: 15px; }
+
+    .radar-meta {
+      display: flex; align-items: center; gap: 12px; min-height: 24px; margin-bottom: 26px;
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 0.02em;
+    }
+    .radar-live {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--green); background: rgba(61,214,140,0.12); border: 1px solid rgba(61,214,140,0.35);
+      padding: 3px 9px; border-radius: 100px;
+    }
+    .radar-live .pulse { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: pulse 1.8s infinite; }
+    .radar-err { color: var(--red); font-family: var(--font-sans); }
+
+    .radar-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .trend-card {
+      background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px;
+      display: flex; flex-direction: column; gap: 14px; position: relative;
+      box-shadow: 0 4px 18px rgba(20,23,31,0.05);
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .trend-card:hover { transform: translateY(-3px); border-color: var(--steel); box-shadow: 0 12px 30px rgba(20,23,31,0.1); }
+    .tc-top { display: flex; align-items: flex-start; gap: 14px; }
+    .tc-rank {
+      font-family: var(--font-display); font-size: 1.7rem; font-weight: 600; line-height: 1;
+      color: var(--steel); flex-shrink: 0; min-width: 42px;
+    }
+    .tc-rank span { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; color: var(--faint); }
+    .tc-head { flex: 1; }
+    .tc-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); line-height: 1.35; margin-bottom: 8px; }
+    .tc-badge {
+      display: inline-block; font-family: var(--font-mono); font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px;
+      background: rgba(79,142,247,0.12); color: var(--steel);
+    }
+    .tc-stats { display: flex; gap: 22px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .tc-stat .ts-num { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--ink); line-height: 1; }
+    .tc-stat .ts-num.up { color: var(--green); }
+    .tc-stat .ts-lbl { font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+    .tc-sources { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tc-source {
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--ink-soft);
+      background: rgba(20,23,31,0.04); border: 1px solid var(--line); padding: 3px 8px; border-radius: 100px;
+    }
+    .tc-use {
+      margin-top: auto; align-self: flex-start; background: transparent; border: 1px solid var(--ink);
+      color: var(--ink); border-radius: 8px; padding: 9px 16px; font-family: var(--font-sans);
+      font-weight: 600; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      transition: background 0.25s, color 0.25s, transform 0.2s;
+    }
+    .tc-use:hover { background: var(--ink); color: var(--paper); transform: translateY(-1px); }
+    .tc-use svg { width: 13px; height: 13px; }
+
+    .trend-skel {
+      background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .radar-skel-line {
+      height: 11px; border-radius: 5px; background: var(--paper-2);
+      background-image: linear-gradient(90deg, rgba(20,23,31,0.03) 0%, rgba(20,23,31,0.09) 50%, rgba(20,23,31,0.03) 100%);
+      background-size: 200% 100%; animation: shimmer 1.3s infinite;
+    }
+    .radar-skel-line.w90 { width: 90%; } .radar-skel-line.w60 { width: 60%; } .radar-skel-line.w40 { width: 40%; }
+    .radar-empty { color: var(--muted); font-style: italic; font-size: 0.92rem; grid-column: 1 / -1; padding: 10px 0; }
+
+    /* ════════════════════════════════════════════════════════════════
        ONE-CLICK CONTENT PACK (interactive tool)
        ════════════════════════════════════════════════════════════════ */
     .tool { position: relative; z-index: 1; padding: 96px 0; background: var(--dark-bg); color: #fff; }
@@ -405,6 +508,7 @@
       .hero { padding: 54px 0 70px; }
       .hero-meta { gap: 24px; }
       .pack-grid { grid-template-columns: 1fr; }
+      .radar-grid { grid-template-columns: 1fr; }
       .mock-body { grid-template-columns: 1fr; }
       .footer-top { flex-direction: column; align-items: flex-start; }
     }
@@ -550,6 +654,39 @@
           Explore Studio
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════ TREND RADAR ════════════════════════ -->
+  <section class="radar" id="radar">
+    <div class="wrap">
+      <span class="radar-eyebrow">Trend Radar</span>
+      <h2 class="radar-title">Scan what's <i>breaking right now.</i></h2>
+      <p class="radar-desc">
+        Pick a lane and pull the live trends Creatrix is tracking this minute — ranked by
+        trend score and growth velocity, with their real sources. Found a winner? Send it
+        straight into the Content Pack below.
+      </p>
+
+      <div class="radar-controls">
+        <div class="radar-cats" id="radar-cats" role="tablist" aria-label="Trend category">
+          <button class="radar-cat active" data-cat="all" type="button">All</button>
+          <button class="radar-cat" data-cat="ai" type="button">AI</button>
+          <button class="radar-cat" data-cat="tech" type="button">Tech</button>
+          <button class="radar-cat" data-cat="business" type="button">Business</button>
+          <button class="radar-cat" data-cat="creator economy" type="button">Creator Economy</button>
+        </div>
+        <button class="radar-btn" id="radar-go" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Scan Live Trends
+        </button>
+      </div>
+
+      <div class="radar-meta" id="radar-meta"></div>
+
+      <div class="radar-grid" id="radar-grid">
+        <div class="radar-empty">Choose a category and hit <strong>Scan Live Trends</strong> to surface ranked, live trends.</div>
       </div>
     </div>
   </section>
@@ -793,6 +930,146 @@
       document.getElementById('pack-topic').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); btn.click(); }
       });
+    })();
+  </script>
+
+  <!-- Trend Radar: live trend discovery + ranking -->
+  <script>
+    (function () {
+      var API = (window.API_BASE || 'http://localhost:8080');
+
+      var esc = function (s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+
+      var grid = document.getElementById('radar-grid');
+      var meta = document.getElementById('radar-meta');
+      var goBtn = document.getElementById('radar-go');
+      var cats = document.getElementById('radar-cats');
+      var selectedCat = 'all';
+
+      // Category selection.
+      cats.addEventListener('click', function (e) {
+        var b = e.target.closest('.radar-cat');
+        if (!b) return;
+        selectedCat = b.getAttribute('data-cat') || 'all';
+        Array.prototype.forEach.call(cats.querySelectorAll('.radar-cat'), function (x) {
+          x.classList.toggle('active', x === b);
+        });
+      });
+
+      function showSkeletons() {
+        var one =
+          '<div class="trend-skel">' +
+          '<div class="radar-skel-line w40"></div>' +
+          '<div class="radar-skel-line w90"></div>' +
+          '<div class="radar-skel-line w60"></div>' +
+          '<div class="radar-skel-line w40"></div>' +
+          '</div>';
+        grid.innerHTML = one + one + one + one;
+      }
+
+      var fmtScore = function (v) {
+        if (v == null || v === '') return '—';
+        var n = Number(v);
+        return isNaN(n) ? esc(v) : (Math.round(n * 10) / 10);
+      };
+
+      var fmtVelocity = function (v) {
+        if (v == null || v === '') return '—';
+        var n = Number(v);
+        if (isNaN(n)) return esc(v);
+        var rounded = Math.round(n * 10) / 10;
+        return (rounded > 0 ? '+' : '') + rounded + '%';
+      };
+
+      function renderTrends(resp) {
+        var trends = (resp && Array.isArray(resp.trends)) ? resp.trends : [];
+        if (!trends.length) {
+          grid.innerHTML = '<div class="radar-empty">No live trends came back for this category. Try another lane or scan again.</div>';
+          meta.innerHTML = '';
+          return;
+        }
+
+        meta.innerHTML =
+          (resp && resp.is_live ? '<span class="radar-live"><span class="pulse"></span>LIVE</span>' : '') +
+          '<span>' + trends.length + ' trends · ' + esc(selectedCat === 'all' ? 'all categories' : selectedCat) + '</span>';
+
+        grid.innerHTML = trends.map(function (t, i) {
+          var title = (t && (t.title || t.name || t.topic)) || 'Untitled trend';
+          var category = (t && (t.category || t.tag)) || (selectedCat === 'all' ? 'Trending' : selectedCat);
+          var sources = (t && Array.isArray(t.sources)) ? t.sources : [];
+          var velUp = (Number(t && t.growth_velocity) || 0) >= 0;
+
+          var sourcesHtml = sources.length
+            ? sources.map(function (s) { return '<span class="tc-source">' + esc(s) + '</span>'; }).join('')
+            : '<span class="tc-source">live feed</span>';
+
+          return (
+            '<article class="trend-card">' +
+              '<div class="tc-top">' +
+                '<div class="tc-rank">#' + (i + 1) + '</div>' +
+                '<div class="tc-head">' +
+                  '<div class="tc-title">' + esc(title) + '</div>' +
+                  '<span class="tc-badge">' + esc(category) + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="tc-stats">' +
+                '<div class="tc-stat"><div class="ts-num">' + fmtScore(t && t.score) + '</div><div class="ts-lbl">Trend Score</div></div>' +
+                '<div class="tc-stat"><div class="ts-num ' + (velUp ? 'up' : '') + '">' + fmtVelocity(t && t.growth_velocity) + '</div><div class="ts-lbl">Growth Velocity</div></div>' +
+              '</div>' +
+              '<div class="tc-sources">' + sourcesHtml + '</div>' +
+              '<button class="tc-use" type="button" data-title="' + esc(title) + '">' +
+                'Use this trend' +
+                '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+              '</button>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      // "Use this trend →" sets the Content Pack topic input + smooth-scrolls to it.
+      grid.addEventListener('click', function (e) {
+        var b = e.target.closest('.tc-use');
+        if (!b) return;
+        var title = b.getAttribute('data-title') || '';
+        var topicInput = document.getElementById('pack-topic');
+        if (topicInput) {
+          topicInput.value = title;
+          var tool = document.getElementById('tool');
+          if (tool && tool.scrollIntoView) tool.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(function () { try { topicInput.focus(); } catch (err) {} }, 500);
+        }
+      });
+
+      function scan() {
+        goBtn.disabled = true;
+        var original = goBtn.innerHTML;
+        goBtn.innerHTML = goBtn.innerHTML.replace('Scan Live Trends', 'Scanning…');
+        meta.innerHTML = '';
+        showSkeletons();
+
+        fetch(API + '/api/v1/trends/discover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: selectedCat, limit: 8 })
+        }).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }).then(function (resp) {
+          renderTrends(resp);
+        }).catch(function (err) {
+          console.warn('Trend Radar failed:', err && err.message);
+          grid.innerHTML = '<div class="radar-empty">Live trends are unavailable right now — start the Creatrix backend and scan again.</div>';
+          meta.innerHTML = '<span class="radar-err">Couldn\'t reach the trend feed.</span>';
+        }).then(function () {
+          goBtn.disabled = false;
+          goBtn.innerHTML = original;
+        });
+      }
+
+      goBtn.addEventListener('click', scan);
     })();
   </script>
 </body>

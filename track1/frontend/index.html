@@ -364,6 +364,61 @@
     }
     .verdict b { font-family: var(--font-serif); color: var(--ink); }
 
+    /* ============ CAMPAIGN PREDICTOR ============ */
+    .predict { padding: 96px 0; }
+    .pillrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 30px; }
+    .cat-pill {
+      font-family: var(--font-sans); font-size: 0.86rem; font-weight: 600;
+      color: var(--muted); background: var(--white);
+      border: 1px solid var(--line); border-radius: 100px;
+      padding: 10px 20px; cursor: pointer;
+      transition: color .2s, border-color .2s, background .2s, box-shadow .2s, transform .2s;
+    }
+    .cat-pill:hover { border-color: var(--blue); color: var(--ink); transform: translateY(-1px); }
+    .cat-pill.active { color: var(--white); background: var(--ink); border-color: var(--ink); box-shadow: 0 8px 20px rgba(13,17,23,.18); }
+
+    .predict-inputs {
+      display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center;
+      max-width: 560px; margin: 0 auto 18px;
+    }
+
+    .predict-out { max-width: 980px; margin: 0 auto; min-height: 40px; }
+    .predict-card {
+      background: var(--white); border: 1px solid var(--line-2); border-radius: 18px;
+      padding: 34px 30px; display: grid; grid-template-columns: 230px 1fr; gap: 34px; align-items: center;
+    }
+
+    /* gauge */
+    .gauge { position: relative; width: 200px; height: 200px; margin: 0 auto; flex-shrink: 0; }
+    .gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .gauge-track { fill: none; stroke: var(--paper-2); stroke-width: 16; }
+    .gauge-fill { fill: none; stroke: var(--blue); stroke-width: 16; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.16,1,.3,1), stroke .4s; }
+    .gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .gauge-pct { font-family: var(--font-serif); font-weight: 800; font-size: 2.9rem; line-height: 1; letter-spacing: -0.02em; color: var(--ink); }
+    .gauge-cap { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-top: 8px; max-width: 130px; }
+
+    .predict-body { display: flex; flex-direction: column; gap: 18px; }
+    .predict-meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .predict-handle { font-family: var(--font-serif); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.01em; word-break: break-word; }
+    .predict-cat-tag {
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--blue-deep); background: rgba(79,142,247,.1); border: 1px solid rgba(79,142,247,.28);
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .predict-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .predict-stat { background: var(--paper); border: 1px solid var(--line-2); border-radius: 12px; padding: 16px 18px; }
+    .predict-stat .ps-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 7px; }
+    .predict-stat .ps-val { font-family: var(--font-mono); font-weight: 700; font-size: 1.4rem; color: var(--ink); }
+    .predict-rec {
+      font-size: 0.96rem; color: var(--muted);
+      background: var(--paper); border: 1px solid var(--line-2); border-radius: 12px; padding: 16px 18px;
+    }
+    .predict-rec b { font-family: var(--font-serif); color: var(--ink); }
+    .predict-rec.strong { border-color: rgba(61,214,140,.4); background: rgba(61,214,140,.06); }
+    .predict-rec.good { border-color: rgba(245,166,35,.4); background: rgba(245,166,35,.06); }
+    .predict-rec.risk { border-color: rgba(240,82,82,.4); background: rgba(240,82,82,.06); }
+    .predict-note { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; color: var(--faint); }
+
     /* ============ FOOTER ============ */
     .footer { background: var(--ink); color: var(--white); padding: 64px 0 40px; }
     .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
@@ -406,6 +461,9 @@
       .metric-label { grid-column: 1; order: -1; }
       .metric-val.left, .metric-val.right { justify-content: center; text-align: center; }
       .metric-val .mbar { display: none; }
+      .predict-inputs { grid-template-columns: 1fr; }
+      .predict-card { grid-template-columns: 1fr; gap: 24px; }
+      .predict-stats { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -591,6 +649,43 @@
       <div class="arena" id="arena" aria-live="polite">
         <div class="arena-msg" id="arena-placeholder">
           Press <b>Compare</b> to run a live head-to-head on real YouTube data.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAMPAIGN SUCCESS PREDICTOR ============ -->
+  <section class="predict reveal" id="predict">
+    <div class="wrap">
+      <div class="tool-head">
+        <div class="eyebrow">Live · Campaign Success Predictor</div>
+        <h2>Will this campaign <i>work?</i></h2>
+        <p>Pick a creator and a brand category. Creatrix IQ pulls real YouTube scores and estimates your campaign's success probability before you commit budget.</p>
+      </div>
+
+      <div class="pillrow" id="cat-pills" role="group" aria-label="Brand category">
+        <button class="cat-pill active" type="button" data-cat="Tech">Tech</button>
+        <button class="cat-pill" type="button" data-cat="Gaming">Gaming</button>
+        <button class="cat-pill" type="button" data-cat="Fashion">Fashion</button>
+        <button class="cat-pill" type="button" data-cat="Finance">Finance</button>
+        <button class="cat-pill" type="button" data-cat="Lifestyle">Lifestyle</button>
+      </div>
+
+      <div class="predict-inputs">
+        <div class="input-field">
+          <label>Creator</label>
+          <span class="at">@</span>
+          <input class="tool-input" id="predict-handle" type="text" value="MrBeast" autocomplete="off" spellcheck="false" aria-label="Creator handle">
+        </div>
+        <button class="compare-btn" id="predict-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l5-5 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 8h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Predict Campaign Success
+        </button>
+      </div>
+
+      <div class="predict-out" id="predict-out" aria-live="polite">
+        <div class="arena-msg" id="predict-placeholder">
+          Press <b>Predict Campaign Success</b> to estimate the odds from live YouTube data.
         </div>
       </div>
     </div>
@@ -803,6 +898,117 @@
       }
     }
 
+    // ---- Campaign Success Predictor ----
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function recFor(pct) {
+      if (pct >= 75) return { cls: "strong", text: "Strong fit — greenlight." };
+      if (pct >= 55) return { cls: "good", text: "Good fit — negotiate rate." };
+      return { cls: "risk", text: "Higher risk — pilot first." };
+    }
+
+    function predictBadge(isReal) {
+      return isReal
+        ? '<span class="live-badge"><span class="dot"></span>Live YouTube data</span>'
+        : '<span class="est-badge">Estimated data</span>';
+    }
+
+    function renderPredict(out, handle, cat, r) {
+      var s = (r && r.scores) || {};
+      var m = (r && r.metrics) || {};
+      var rate = num(s.ratefluencer_score);
+      var auth = num(s.authenticity_score);
+      var eng = num(s.engagement_score) || 50;
+      var followers = num(m.followers);
+      var engRate = num(m.engagement_rate);
+      var isReal = !!(r && r.is_real);
+
+      var pct = clamp(Math.round(0.5 * rate + 0.3 * auth + 0.2 * eng), 1, 99);
+      var engaged = Math.round(followers * engRate / 100);
+      var rec = recFor(pct);
+
+      // gauge geometry (r = 80, circumference ≈ 502.65)
+      var circ = 2 * Math.PI * 80;
+      var offset = circ * (1 - pct / 100);
+      var stroke = pct >= 75 ? "var(--green)" : (pct >= 55 ? "var(--amber)" : "var(--red)");
+
+      out.innerHTML =
+        '<div class="predict-card">' +
+          '<div class="gauge">' +
+            '<svg viewBox="0 0 200 200" aria-hidden="true">' +
+              '<circle class="gauge-track" cx="100" cy="100" r="80"/>' +
+              '<circle class="gauge-fill" cx="100" cy="100" r="80" ' +
+                'style="stroke:' + stroke + ';stroke-dasharray:' + circ.toFixed(2) + ';stroke-dashoffset:' + offset.toFixed(2) + '"/>' +
+            '</svg>' +
+            '<div class="gauge-center">' +
+              '<span class="gauge-pct">' + pct + '%</span>' +
+              '<span class="gauge-cap">Est. campaign success probability</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="predict-body">' +
+            '<div class="predict-meta-row">' +
+              '<span class="predict-handle">@' + esc(handle) + '</span>' +
+              '<span class="predict-cat-tag">' + esc(cat) + ' campaign</span>' +
+              predictBadge(isReal) +
+            '</div>' +
+            '<div class="predict-stats">' +
+              '<div class="predict-stat">' +
+                '<div class="ps-label">Estimated Reach</div>' +
+                '<div class="ps-val">' + fmtFollowers(followers) + '</div>' +
+              '</div>' +
+              '<div class="predict-stat">' +
+                '<div class="ps-label">Est. Engaged Audience</div>' +
+                '<div class="ps-val">' + fmtFollowers(engaged) + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="predict-rec ' + rec.cls + '"><b>' + esc(rec.text) + '</b></div>' +
+            '<div class="predict-note">Estimates derived from live Ratefluencer, authenticity &amp; engagement scores.</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function initPredict() {
+      var btn = document.getElementById("predict-btn");
+      var input = document.getElementById("predict-handle");
+      var out = document.getElementById("predict-out");
+      var pills = document.getElementById("cat-pills");
+      if (!btn || !input || !out || !pills) return;
+
+      var category = "Tech";
+      pills.addEventListener("click", function (e) {
+        var p = e.target.closest(".cat-pill");
+        if (!p) return;
+        category = p.getAttribute("data-cat") || "Tech";
+        Array.prototype.forEach.call(pills.querySelectorAll(".cat-pill"), function (el) {
+          el.classList.toggle("active", el === p);
+        });
+      });
+
+      async function run() {
+        var handle = cleanHandle(input.value) || "MrBeast";
+        input.value = handle;
+
+        btn.disabled = true;
+        out.innerHTML =
+          '<div class="spinner-row"><span class="spinner"></span>' +
+          'Estimating campaign odds for <b>&nbsp;@' + esc(handle) + '&nbsp;</b>…</div>';
+
+        try {
+          var r = await analyze(handle);
+          renderPredict(out, handle, category, r);
+        } catch (err) {
+          out.innerHTML = '<div class="arena-msg error">' +
+            esc("We couldn't reach the Creatrix IQ engine just now. Make sure the backend is running, then try again.") +
+            '</div>';
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      btn.addEventListener("click", run);
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+    }
+
     // Scroll reveal
     function reveals() {
       var els = document.querySelectorAll(".reveal");
@@ -819,9 +1025,9 @@
     }
 
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", function () { init(); reveals(); });
+      document.addEventListener("DOMContentLoaded", function () { init(); initPredict(); reveals(); });
     } else {
-      init(); reveals();
+      init(); initPredict(); reveals();
     }
   })();
   </script>
