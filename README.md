@@ -25,11 +25,15 @@
 
 | | URL |
 |---|---|
-| 🖥️ **Live App** | **https://creatrixai.web.app** |
+| 🖥️ **Live App (Full Platform · Grand Challenge)** | **https://creatrixai.web.app** |
 | 📊 **Dashboard** | **https://creatrixai.web.app/dashboard.html** |
+| 🧠 **Creatrix IQ — Track 1 (Influencer Intelligence)** | **https://creatrix-iq.web.app** |
+| 🎬 **Creatrix Studio — Track 2 (Viral Content Agent)** | **https://creatrix-studio.web.app** |
 | 📚 **Interactive API Docs (Swagger)** | **https://creatrix-ai-backend-3692981377.us-central1.run.app/docs** |
 | ❤️ **Health Check** | **https://creatrix-ai-backend-3692981377.us-central1.run.app/health** |
 | 💻 **GitHub** | **https://github.com/Avi36005/Creatrix-AI-** |
+
+> **Three separate live deployments, one repo.** The **Full Platform** above solves the Grand Challenge end-to-end. Track 1 and Track 2 are also shipped as **standalone, independently deployed apps** (own Cloud Run service + own Firebase site, same real data/keys) — see [Standalone Track Apps](#standalone-track-apps-track-1--track-2) below.
 
 </div>
 
@@ -62,6 +66,25 @@ Type any creator  ──►  REAL data pulled live  ──►  ML scores + AI co
 | **Track 01 — AI Influencer Intelligence Engine** | Brands invest billions on follower counts that don't predict ROI | **Ratefluencer Score™** (XGBoost) + **IsolationForest** fake-follower detection, growth forecasting & RAG brand matching — **on real YouTube data** | ✅ |
 | **Track 02 — AI Viral Reel Creator Agent** | Creators spend days on research → script → edit → caption | Autonomous pipeline: **live trend discovery → script → voiceover → virality prediction** | ✅ |
 | **Grand Challenge — Autonomous Ecosystem** | Build the full Ratefluencer AI ecosystem | **5-step LangGraph SSE agent** streaming Scout → Score → Script → Predict → Synthesize, end-to-end | ✅ |
+
+---
+
+## Standalone Track Apps (Track 1 + Track 2)
+
+Beyond the unified platform (which solves the **Grand Challenge**), Track 1 and Track 2 are each shipped as their **own independently deployed product** — a separate Cloud Run backend **and** a separate Firebase Hosting site, using the **same real keys and live data**, with **no cross-linking** and **zero impact on the main app**. Each is built from the same proven engine, with a bespoke editorial landing page and a unique interactive tool. Source lives in [`track1/`](track1/) and [`track2/`](track2/).
+
+| | 🧠 Creatrix IQ — Track 1 | 🎬 Creatrix Studio — Track 2 |
+|---|---|---|
+| **Focus** | AI Influencer Intelligence Engine | AI Viral Reel Creator Agent |
+| **Live app** | **https://creatrix-iq.web.app** | **https://creatrix-studio.web.app** |
+| **API docs** | [Swagger](https://creatrix-iq-m477e5mida-uc.a.run.app/docs) | [Swagger](https://creatrix-studio-m477e5mida-uc.a.run.app/docs) |
+| **Cloud Run service** | `creatrix-iq` | `creatrix-studio` |
+| **Source** | [`track1/`](track1/) | [`track2/`](track2/) |
+| **Core (per hackathon brief)** | Ratefluencer Score™, fake-follower detection, growth forecast, RAG brand matching — on **real YouTube data** | Live trend discovery + ranking, reel scripts, LinkedIn + Instagram content, AI images, virality prediction |
+| **⭐ Unique feature** | **Creator vs Creator** — analyze two creators live and compare Ratefluencer / Authenticity / Growth / Brand scores side-by-side | **One-Click Content Pack** — one topic → reel script + LinkedIn post + Instagram caption + virality score, generated in parallel |
+| **Inside app** | Track-focused dashboard (scoring · authenticity · growth · brand matcher) | Track-focused dashboard (trends · scripts · LinkedIn · Instagram · virality) |
+
+Each landing page follows its own editorial design; the "inside" reuses the proven Creatrix dashboard filtered to that track. **All data is real** (YouTube Data API + Gemini / Groq / OpenAI / ElevenLabs) — no mocks. The three deployments are fully independent: editing one never affects the others.
 
 ---
 
